@@ -10,3 +10,5 @@ target/
 build/
 .gradle/
 sample-data/_local/
+lib/*.jar
+.env
