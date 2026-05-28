@@ -8,6 +8,8 @@ OpenMetadata local stack + Spark job demonstrating lineage from a raw CSV to a d
 - Java 21 (`JAVA_HOME=/opt/homebrew/opt/openjdk@21`)
 - sbt 1.12.11
 
+> Complete steps 1 and 2 below before any `sbt` commands — `build.sbt` references `lib/openmetadata-spark-agent-1.1.jar` as an unmanaged dependency.
+
 ## 1. Start the OMD stack (Acceptance item 1)
 
 ```bash
