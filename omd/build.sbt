@@ -19,6 +19,17 @@ lazy val root = (project in file("."))
     libraryDependencies ++= Seq(
       "org.scalatest" %% "scalatest" % "3.2.19" % Test,
     ),
+    // Spark uses reflection/serialization that breaks sbt's default layered classloader
+    Test / classLoaderLayeringStrategy := ClassLoaderLayeringStrategy.Flat,
+    // Spark 3.5 accesses JDK internals restricted by default in Java 17+
+    Test / javaOptions ++= Seq(
+      "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
+      "--add-opens=java.base/java.nio=ALL-UNNAMED",
+      "--add-opens=java.base/java.lang=ALL-UNNAMED",
+      "--add-opens=java.base/java.util=ALL-UNNAMED",
+      "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
+    ),
+    Test / fork := true,
     // sbt-assembly merge strategy for META-INF conflicts from Spark jars
     assembly / assemblyMergeStrategy := {
       case PathList("META-INF", xs @ _*) => MergeStrategy.discard
