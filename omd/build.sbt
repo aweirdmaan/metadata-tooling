@@ -30,6 +30,8 @@ lazy val root = (project in file("."))
       "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
     ),
     Test / fork := true,
+    // OMD Spark Agent jar lives in lib/ (downloaded manually — see README)
+    Compile / unmanagedJars += file("lib/openmetadata-spark-agent-1.1.jar"),
     // sbt-assembly merge strategy for META-INF conflicts from Spark jars
     assembly / assemblyMergeStrategy := {
       case PathList("META-INF", xs @ _*) => MergeStrategy.discard

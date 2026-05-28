@@ -14,6 +14,9 @@ object BuildSensorProfiles extends SparkMain[BuildSensorProfilesArgs] {
 
   val defaultArgs = BuildSensorProfilesArgs()
 
+  override protected def sparkBuilder() =
+    OmdSparkSession.builder(appName).appName(appName).master("local[*]")
+
   val argParser: OParser[Unit, BuildSensorProfilesArgs] = {
     val b = OParser.builder[BuildSensorProfilesArgs]
     import b._
