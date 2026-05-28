@@ -20,7 +20,7 @@ networks:
 services:
   postgresql:
     container_name: openmetadata_postgresql
-    image: docker.getcrane.com/openmetadata/postgresql:1.12.0
+    image: docker.io/openmetadata/postgresql:1.12.0
     restart: always
     environment:
       POSTGRES_USER: openmetadata_user
@@ -62,7 +62,7 @@ services:
   openmetadata-server:
     container_name: openmetadata_server
     restart: always
-    image: docker.getcrane.com/openmetadata/server:1.12.0
+    image: docker.io/openmetadata/server:1.12.0
     environment:
       OPENMETADATA_CLUSTER_NAME: openmetadata
       LOG_LEVEL: INFO
@@ -103,7 +103,7 @@ services:
 
   openmetadata-ingestion:
     container_name: openmetadata_ingestion
-    image: docker.getcrane.com/openmetadata/ingestion:1.12.0
+    image: docker.io/openmetadata/ingestion:1.12.0
     depends_on:
       openmetadata-server:
         condition: service_healthy
