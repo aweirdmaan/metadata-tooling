@@ -1,0 +1,19 @@
+.beads/embeddeddolt/
+.beads/backup/
+.beads/interactions.jsonl
+.beads/export-state.json
+.beads/last-touched
+.idea/
+.vscode/
+*.iml
+target/
+build/
+.gradle/
+sample-data/_local/
+lib/*.jar
+.env
+
+# Beads / Dolt files (added by bd init)
+.dolt/
+*.db
+.beads-credential-key
