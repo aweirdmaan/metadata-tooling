@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataHub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:           #fafaf7;
+  --surface:      #ffffff;
+  --ink:          #1f2937;
+  --ink-heading:  #0f172a;
+  --muted:        #64748b;
+  --accent:       #0e7490;
+  --accent-soft:  #ecfeff;
+  --accent-hover: #0891b2;
+  --border:       #e5e7eb;
+  --rule:         #d1d5db;
+  --code-bg:      #f1f5f9;
+  --code-ink:     #334155;
+  --pre-bg:       #0f172a;
+  --pre-ink:      #e2e8f0;
+  --shadow:       0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  font-size:16px;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Layout */
+.layout{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  max-width:1440px;
+  margin:0 auto;
+  gap:3rem;
+  padding:0 2rem;
+}
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr;gap:0}
+  nav#TOC{position:static !important;max-height:none !important;border-right:none;border-bottom:1px solid var(--border);padding:1rem 0 1.5rem !important}
+}
+
+/* Header band */
+header.brand{
+  background:linear-gradient(135deg, #0f172a 0%, #0e7490 100%);
+  color:#fff;
+  padding:2.4rem 2rem 2rem;
+  margin-bottom:3rem;
+}
+header.brand .inner{
+  max-width:1440px;
+  margin:0 auto;
+  padding:0 0rem;
+}
+header.brand .eyebrow{
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  opacity:.75;
+  margin-bottom:.4rem;
+  font-weight:500;
+}
+header.brand h1.brand-title{
+  font-size:2.4rem;
+  font-weight:700;
+  letter-spacing:-0.02em;
+  margin:0 0 .3rem;
+  border:none;
+  color:#fff;
+}
+header.brand .tagline{
+  color:#cffafe;
+  font-family:'Lora', serif;
+  font-style:italic;
+  font-size:1.05rem;
+  margin:0;
+  opacity:.95;
+}
+
+/* TOC sidebar */
+nav#TOC{
+  position:sticky;
+  top:1.5rem;
+  align-self:start;
+  padding:1.5rem 0;
+  max-height:calc(100vh - 3rem);
+  overflow-y:auto;
+  font-size:.88rem;
+  border-right:1px solid var(--border);
+  padding-right:1.4rem;
+}
+nav#TOC::-webkit-scrollbar{width:6px}
+nav#TOC::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+nav#TOC ul{
+  list-style:none;
+  padding-left:0;
+  margin:0;
+}
+nav#TOC > ul > li{margin-bottom:.3rem}
+nav#TOC ul ul{padding-left:1rem;margin-top:.2rem}
+nav#TOC a{
+  color:var(--muted);
+  text-decoration:none;
+  display:block;
+  padding:.25rem .6rem;
+  border-radius:5px;
+  border-left:2px solid transparent;
+  transition:all .15s ease;
+  font-weight:500;
+}
+nav#TOC a:hover{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+}
+nav#TOC a.active{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+  font-weight:600;
+}
+
+/* Main content */
+main{
+  max-width:920px;
+  padding:.5rem 0 4rem;
+}
+main h1:first-child{display:none}
+
+/* Typography */
+h1,h2,h3,h4{
+  color:var(--ink-heading);
+  letter-spacing:-0.015em;
+  scroll-margin-top:1.5rem;
+}
+h1{font-size:2.1rem;font-weight:700;margin:0 0 1.4rem;padding-bottom:.5rem;border-bottom:3px solid var(--accent)}
+h2{font-size:1.5rem;font-weight:600;margin:2.6rem 0 .8rem;padding-bottom:.35rem;border-bottom:1px solid var(--rule)}
+h3{font-size:1.15rem;font-weight:600;color:var(--accent);margin:1.8rem 0 .6rem}
+
+p{margin:.9rem 0}
+strong{color:var(--ink-heading);font-weight:600}
+
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+a:hover{border-bottom-color:var(--accent)}
+
+/* Inline + block code */
+code{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--code-bg);
+  color:var(--code-ink);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:.85em;
+  font-weight:500;
+  border:1px solid #e2e8f0;
+}
+pre{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--pre-bg);
+  color:var(--pre-ink);
+  padding:1.1rem 1.3rem;
+  border-radius:8px;
+  overflow-x:auto;
+  font-size:.84em;
+  line-height:1.6;
+  margin:1.2rem 0;
+  box-shadow:var(--shadow);
+}
+pre code{background:none;color:inherit;padding:0;border:none;font-size:1em;font-weight:400}
+
+/* Lists */
+ul,ol{padding-left:1.6rem;margin:.7rem 0 1rem}
+li{margin:.3rem 0}
+li::marker{color:var(--accent)}
+
+/* Blockquote */
+blockquote{
+  border-left:3px solid var(--accent);
+  background:var(--accent-soft);
+  margin:1.2rem 0;
+  padding:.7rem 1.2rem;
+  border-radius:0 6px 6px 0;
+  color:var(--ink);
+}
+blockquote p:first-child{margin-top:0}
+blockquote p:last-child{margin-bottom:0}
+
+/* Tables */
+table{
+  border-collapse:separate;
+  border-spacing:0;
+  margin:1.4rem 0;
+  font-size:.93em;
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+thead{background:#0f172a;color:#f8fafc}
+th{padding:.6rem .9rem;text-align:left;font-weight:600;font-size:.88em;letter-spacing:.01em}
+td{padding:.55rem .9rem;border-top:1px solid var(--border);vertical-align:top}
+tbody tr:nth-child(even){background:#f8fafc}
+
+hr{border:none;border-top:1px solid var(--rule);margin:2.4rem 0}
+
+/* Footer */
+footer.foot{
+  max-width:1440px;
+  margin:3rem auto 2rem;
+  padding:1.5rem 2rem;
+  color:var(--muted);
+  font-size:.85rem;
+  border-top:1px solid var(--border);
+  text-align:center;
+  font-family:'Lora',serif;
+  font-style:italic;
+}
+</style>
+</head>
+<body>
+
+<header class="brand">
+  <div class="inner">
+    <div class="eyebrow">Capability brief</div>
+    <h1 class="brand-title">DataHub</h1>
+    <p class="tagline">An event-driven metadata platform built around
+aspect composition.</p>
+  </div>
+</header>
+
+<div class="layout">
+    <ul>
+    <li><a href="#datahub" id="toc-datahub">DataHub</a>
+    <ul>
+    <li><a href="#what-it-is" id="toc-what-it-is">What it is</a></li>
+    <li><a href="#how-the-model-is-shaped"
+    id="toc-how-the-model-is-shaped">How the model is shaped</a></li>
+    <li><a href="#what-it-does" id="toc-what-it-does">What it
+    does</a></li>
+    <li><a href="#what-it-doesnt-do" id="toc-what-it-doesnt-do">What it
+    doesn’t do</a></li>
+    <li><a href="#what-surprised-in-this-poc"
+    id="toc-what-surprised-in-this-poc">What surprised in this
+    POC</a></li>
+    <li><a href="#running-it" id="toc-running-it">Running it</a></li>
+    </ul></li>
+    </ul>
+    <main>
+  <h1 id="datahub">DataHub</h1>
+  <p>A read on what DataHub is, what it does, and where it’s thin.</p>
+  <hr />
+  <h2 id="what-it-is">What it is</h2>
+  <p>A self-hosted metadata platform built around an event-driven
+  architecture. The mental model is closer to a Kafka-fronted metadata
+  bus than a CRUD catalog: anything that produces metadata publishes a
+  typed event (“this dataset got a new owner”, “this pipeline finished a
+  run”), and many consumers — the search index, the lineage graph store,
+  the alerting engine, external integrations — subscribe and react.</p>
+  <p>Originally built at LinkedIn, now stewarded by Acryl Data.
+  Java/Spring backend (the GMS service), React UI, and a fairly heavy
+  stack: MySQL for entity state, Kafka for the event bus, Elasticsearch
+  for search, Neo4j (or MySQL) for the lineage graph, plus several JVM
+  services that consume from Kafka and update the indexes. Six to nine
+  containers in a typical deployment.</p>
+  <p>Connectors are Python recipes
+  (<code>pip install acryl-datahub</code>, run via
+  <code>datahub ingest -c recipe.yml</code>) that pull metadata from
+  external systems — Snowflake, dbt, Airflow, Tableau, BigQuery, Kafka
+  itself, and so on.</p>
+  <h2 id="how-the-model-is-shaped">How the model is shaped</h2>
+  <p>The thing that distinguishes DataHub from every other catalog is
+  <strong>aspect composition</strong>. Where OpenMetadata stores each
+  entity as one monolithic JSON document, DataHub stores it as a
+  collection of independently-versioned <strong>aspects</strong> — small
+  typed fragments.</p>
+  <p>A <code>Dataset</code> entity in DataHub isn’t a single record.
+  It’s an URN plus whatever aspects have been attached:
+  <code>datasetProperties</code>, <code>schemaMetadata</code>,
+  <code>ownership</code>, <code>glossaryTerms</code>,
+  <code>globalTags</code>, <code>datasetProfile</code>,
+  <code>upstreamLineage</code>, and so on. Each aspect has its own
+  version history. Two producers can update two different aspects on the
+  same entity without ever touching each other.</p>
+  <p>The shape:</p>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Layer</th>
+  <th>Examples</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>Entity</td>
+  <td>Dataset, DataFlow, DataJob, Chart, Dashboard, MLModel, Tag,
+  GlossaryTerm, CorpUser, CorpGroup, Domain, Container, DataProduct</td>
+  </tr>
+  <tr>
+  <td>Aspect</td>
+  <td>ownership, datasetProperties, schemaMetadata, upstreamLineage,
+  datasetProfile, globalTags, assertions, status,
+  datasetUsageStatistics</td>
+  </tr>
+  <tr>
+  <td>Identity</td>
+  <td><code>urn:li:dataset:(urn:li:dataPlatform:snowflake,fct_users,PROD)</code>
+  — platform + name + environment encoded into one string</td>
+  </tr>
+  <tr>
+  <td>Storage</td>
+  <td>MySQL (entity-aspect rows), Elasticsearch (search), Kafka (event
+  log), Neo4j or MySQL (graph)</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>Lineage is one aspect among many — <code>upstreamLineage</code>
+  lists the URN of upstream entities, with optional column-level
+  mappings and pipeline references. It lives in the graph store as a
+  separate edge table.</p>
+  <h2 id="what-it-does">What it does</h2>
+  <h3 id="search-and-discovery">Search and discovery</h3>
+  <p>Faceted search backed by Elasticsearch. Type-ahead, filters by
+  domain / tag / glossary term / owner. Each entity has a canonical page
+  composed dynamically from whatever aspects exist on it. Glossary terms
+  work as searchable facets and can be applied to columns or whole
+  datasets.</p>
+  <p>The GraphQL API at <code>/api/graphql</code> is the primary read
+  surface — query an entity and ask for exactly the aspects you need.
+  REST endpoints under <code>/aspects</code> and <code>/openapi</code>
+  work for writes.</p>
+  <h3 id="lineage">Lineage</h3>
+  <p>Graph-shaped, table-level and column-level. Edges are produced
+  three ways:</p>
+  <ul>
+  <li><strong>Spark Lineage agent</strong> — Acryl publishes
+  <code>acryl-spark-lineage</code> as a Maven dependency. Drop it on the
+  Spark classpath, set
+  <code>spark.extraListeners=datahub.spark.DatahubSparkListener</code>,
+  and Spark jobs post lineage events to GMS as they run.</li>
+  <li><strong>Recipe-based ingestion</strong> — connectors for dbt,
+  Airflow, Looker, etc. parse pipeline definitions and post
+  <code>upstreamLineage</code> aspects.</li>
+  <li><strong>API</strong> —
+  <code>POST /aspects?action=ingestProposal</code> for direct edge
+  creation.</li>
+  </ul>
+  <p>The lineage view in the UI renders heterogeneous nodes: tables,
+  dashboards, pipelines (DataFlow / DataJob), ML models can all appear
+  in the same graph. Each edge can carry column-level mappings and a
+  pipeline reference.</p>
+  <h3 id="pipeline-model">Pipeline model</h3>
+  <p>Two entity types: <strong>DataFlow</strong> (a pipeline service /
+  parent group — e.g. “spark-poc”) and <strong>DataJob</strong> (a
+  single executable inside a flow — e.g. “build_sensor_profiles”).
+  DataJobs declare their input/output datasets via
+  <code>dataJobInputOutput</code>. This is what lets DataHub’s lineage
+  view show pipelines as nodes alongside data assets.</p>
+  <h3 id="data-quality-assertions">Data quality (Assertions)</h3>
+  <p>Assertions in DataHub are first-class entities, not children of a
+  parent test suite. Two aspects matter:</p>
+  <ul>
+  <li><code>assertionInfo</code> — the definition (which dataset, which
+  column, what operator like <code>NOT_NULL</code> or
+  <code>BETWEEN</code> with parameters)</li>
+  <li><code>assertionRunEvent</code> — one row per execution, with
+  status (<code>SUCCESS</code> / <code>FAILURE</code>) and observed
+  values</li>
+  </ul>
+  <p>The DataHub UI surfaces assertion runs on the dataset page and
+  renders status badges on lineage nodes. Native DataHub assertions are
+  deterministic and threshold-based, like OMD’s. The same
+  <code>assertion</code> entity model is also how Great Expectations and
+  Soda integrations land their results — they reuse the schema, so a
+  GX-defined check and a native check look identical in the UI.</p>
+  <h3 id="governance">Governance</h3>
+  <ul>
+  <li><strong>Ownership</strong> as an aspect, with multiple owner types
+  (DATAOWNER, TECHNICAL_OWNER, BUSINESS_OWNER, STEWARD).</li>
+  <li><strong>GlobalTags</strong> for tier classifications (Tier1..Tier4
+  via <code>urn:li:tag:Tier1</code> etc.) and arbitrary tagging.</li>
+  <li><strong>Glossary</strong> with hierarchical terms and synonyms;
+  terms can be attached to columns.</li>
+  <li><strong>Domains</strong> for business grouping; assets belong to a
+  domain via the <code>domains</code> aspect.</li>
+  <li><strong>DataProducts</strong> for consumer-facing bundles of
+  assets.</li>
+  </ul>
+  <h3 id="profiling">Profiling</h3>
+  <p><code>datasetProfile</code> aspect carries time-series stats — row
+  count, column count, size in bytes, plus per-column
+  <code>fieldProfiles</code> with null counts, unique counts, min/max,
+  mean, sample values. Profiles get produced either by recipe-based
+  profilers (run on a schedule) or pushed directly via the API.</p>
+  <h3 id="alerting-and-webhooks">Alerting and webhooks</h3>
+  <p>Because everything flows through Kafka, alerting is a first-class
+  consumer pattern. Subscriptions filter events (“any Assertion with
+  status=FAILURE on a Tier1 Dataset”) and fan out to Slack, MS Teams,
+  PagerDuty, email, or arbitrary webhooks. The same mechanism is how the
+  search-index updater stays current — there’s no distinction between
+  “internal sync” and “external integration” at the platform layer.</p>
+  <h3 id="auth-and-access">Auth and access</h3>
+  <p>OIDC (Okta, Azure AD, Google, Auth0), JWT, and the default
+  username/password setup. The quickstart ships with token-based auth
+  disabled and <code>datahub/datahub</code> as the only login. A roles +
+  policies framework controls who can edit what aspect on which entity
+  type, with support for fine-grained policies like “Marketing team can
+  edit <code>ownership</code> on assets where domain=Marketing”.</p>
+  <h3 id="connectors">Connectors</h3>
+  <p>Around 80 source connectors covering data warehouses (Snowflake,
+  BigQuery, Redshift, Databricks), dashboards (Tableau, Power BI,
+  Looker, Superset), pipelines (Airflow, dbt, Prefect, Dagster), ML
+  (MLflow, SageMaker, Feast), and DQ producers (Great Expectations,
+  Soda). Each is a Python module with a YAML recipe; runs ad-hoc, on a
+  UI-managed schedule, or inside a user’s Airflow.</p>
+  <h2 id="what-it-doesnt-do">What it doesn’t do</h2>
+  <ul>
+  <li><strong>No catalog without operating Kafka.</strong> The event bus
+  is the core architectural commitment. A standalone “just the UI”
+  deployment doesn’t exist.</li>
+  <li><strong>Heavier ops</strong> than OMD or ODD. Six-plus containers,
+  multiple JVM services, MySQL + Kafka + ES + Neo4j. Acryl Data sells a
+  hosted version, suggesting most teams don’t want to operate this
+  themselves.</li>
+  <li><strong>Anomaly detection is not built in.</strong> Assertions are
+  deterministic; statistical anomalies need Great Expectations, Monte
+  Carlo, or a custom producer.</li>
+  <li><strong>In-app BI / chart builder</strong> doesn’t exist. External
+  BI tools register as Dashboard Services and get catalogued.</li>
+  <li><strong>The quickstart isn’t production-ready.</strong> It runs
+  everything on one node with no auth and default secrets. Real
+  deployments need significant config.</li>
+  </ul>
+  <h2 id="what-surprised-in-this-poc">What surprised in this POC</h2>
+  <p>Real notes from running it end-to-end:</p>
+  <ul>
+  <li><strong>Quickstart env vars aren’t filled in by default.</strong>
+  <code>DATAHUB_TOKEN_SERVICE_SIGNING_KEY</code> and
+  <code>DATAHUB_TOKEN_SERVICE_SALT</code> come up blank, the
+  <code>system-update-quickstart</code> init container crash-loops, and
+  the rest of the stack waits forever. The CLI usually sets these when
+  it generates the compose; if running compose directly, write a
+  <code>.env</code> first.</li>
+  <li><strong>Token auth is disabled by default</strong>, but every UI
+  surface implies it’s available. Generating a token from Settings will
+  show “Token based authentication is currently disabled”. GMS happily
+  accepts unauthenticated writes in quickstart mode, which is fine for a
+  POC and dangerous otherwise.</li>
+  <li><strong>Aspect value must be a JSON-encoded string, not raw
+  JSON.</strong> The <code>ingestProposal</code> payload has
+  <code>aspect.value</code> typed as a string carrying serialized JSON
+  inside. Passing raw JSON returns a confusing 500 with a Restli
+  internal-server-error stack trace pointing at validation.</li>
+  <li><strong>The Restli validator rejects non-ASCII characters in some
+  string fields.</strong> Em dashes in descriptions caused a 400 with
+  “is not a valid string”. Hyphens fixed it.</li>
+  <li><strong>MetadataChangeProposal needs
+  <code>changeType</code>.</strong> Setting it to <code>UPSERT</code>
+  (or <code>CREATE</code>, <code>UPDATE</code>, <code>DELETE</code>) is
+  required on every proposal; omitting it returns a misleading 500.</li>
+  <li><strong>Pipelines are DataFlow + DataJob, not a single
+  entity.</strong> A pipeline visible in the lineage view requires
+  posting two entities and linking the DataJob to its inputs and outputs
+  via the <code>dataJobInputOutput</code> aspect. Slightly more work
+  than OMD’s single Pipeline entity.</li>
+  </ul>
+  <h2 id="running-it">Running it</h2>
+  <p>The POC at <code>pocs/datahub</code>:</p>
+  <ul>
+  <li><code>datahub docker quickstart</code> brings up GMS, frontend,
+  MySQL, Kafka, OpenSearch, and the system-update init container.
+  Frontend on http://localhost:9002 (login
+  <code>datahub/datahub</code>), GMS on http://localhost:8080.</li>
+  <li><code>scripts/seed-datahub.sh</code> posts the four datasets with
+  schemas, two lineage edges, and two assertions with results.</li>
+  <li><code>scripts/populate-metadata.sh</code> adds the DataFlow + two
+  DataJobs, ownership on every entity, tier tags, the
+  <code>spark-poc</code> domain, and <code>datasetProfile</code>
+  stats.</li>
+  <li><code>src/main/scala/com/poc/datahub/DatahubSparkSession.scala</code>
+  builds a SparkSession wired with
+  <code>datahub.spark.DatahubSparkListener</code> and the necessary
+  <code>spark.datahub.rest.*</code> configuration so jobs land lineage
+  at the GMS endpoint.</li>
+  </ul>
+  <p>End state: a stack walkable through Search → Lineage → Assertions →
+  Domain pages in the same way as OMD.</p>
+  </main>
+</div>
+
+<footer class="foot">openmetadata · poc notes</footer>
+
+<script>
+// Smooth-scroll active TOC link
+document.addEventListener('DOMContentLoaded', () => {
+  const tocLinks = document.querySelectorAll('nav#TOC a[href^="#"]');
+  if (!tocLinks.length) return;
+  const targets = Array.from(tocLinks).map(a => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+  const linkFor = new Map();
+  tocLinks.forEach(a => linkFor.set(a.getAttribute('href').slice(1), a));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const id = e.target.id;
+      const link = linkFor.get(id);
+      if (!link) return;
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  targets.forEach(t => obs.observe(t));
+});
+</script>
+</body>
+</html>

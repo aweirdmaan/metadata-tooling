@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DataHub Domain Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:           #fafaf7;
+  --surface:      #ffffff;
+  --ink:          #1f2937;
+  --ink-heading:  #0f172a;
+  --muted:        #64748b;
+  --accent:       #0e7490;
+  --accent-soft:  #ecfeff;
+  --accent-hover: #0891b2;
+  --border:       #e5e7eb;
+  --rule:         #d1d5db;
+  --code-bg:      #f1f5f9;
+  --code-ink:     #334155;
+  --pre-bg:       #0f172a;
+  --pre-ink:      #e2e8f0;
+  --shadow:       0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  font-size:16px;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Layout */
+.layout{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  max-width:1440px;
+  margin:0 auto;
+  gap:3rem;
+  padding:0 2rem;
+}
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr;gap:0}
+  nav#TOC{position:static !important;max-height:none !important;border-right:none;border-bottom:1px solid var(--border);padding:1rem 0 1.5rem !important}
+}
+
+/* Header band */
+header.brand{
+  background:linear-gradient(135deg, #0f172a 0%, #0e7490 100%);
+  color:#fff;
+  padding:2.4rem 2rem 2rem;
+  margin-bottom:3rem;
+}
+header.brand .inner{
+  max-width:1440px;
+  margin:0 auto;
+  padding:0 0rem;
+}
+header.brand .eyebrow{
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  opacity:.75;
+  margin-bottom:.4rem;
+  font-weight:500;
+}
+header.brand h1.brand-title{
+  font-size:2.4rem;
+  font-weight:700;
+  letter-spacing:-0.02em;
+  margin:0 0 .3rem;
+  border:none;
+  color:#fff;
+}
+header.brand .tagline{
+  color:#cffafe;
+  font-family:'Lora', serif;
+  font-style:italic;
+  font-size:1.05rem;
+  margin:0;
+  opacity:.95;
+}
+
+/* TOC sidebar */
+nav#TOC{
+  position:sticky;
+  top:1.5rem;
+  align-self:start;
+  padding:1.5rem 0;
+  max-height:calc(100vh - 3rem);
+  overflow-y:auto;
+  font-size:.88rem;
+  border-right:1px solid var(--border);
+  padding-right:1.4rem;
+}
+nav#TOC::-webkit-scrollbar{width:6px}
+nav#TOC::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+nav#TOC ul{
+  list-style:none;
+  padding-left:0;
+  margin:0;
+}
+nav#TOC > ul > li{margin-bottom:.3rem}
+nav#TOC ul ul{padding-left:1rem;margin-top:.2rem}
+nav#TOC a{
+  color:var(--muted);
+  text-decoration:none;
+  display:block;
+  padding:.25rem .6rem;
+  border-radius:5px;
+  border-left:2px solid transparent;
+  transition:all .15s ease;
+  font-weight:500;
+}
+nav#TOC a:hover{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+}
+nav#TOC a.active{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+  font-weight:600;
+}
+
+/* Main content */
+main{
+  max-width:920px;
+  padding:.5rem 0 4rem;
+}
+main h1:first-child{display:none}
+
+/* Typography */
+h1,h2,h3,h4{
+  color:var(--ink-heading);
+  letter-spacing:-0.015em;
+  scroll-margin-top:1.5rem;
+}
+h1{font-size:2.1rem;font-weight:700;margin:0 0 1.4rem;padding-bottom:.5rem;border-bottom:3px solid var(--accent)}
+h2{font-size:1.5rem;font-weight:600;margin:2.6rem 0 .8rem;padding-bottom:.35rem;border-bottom:1px solid var(--rule)}
+h3{font-size:1.15rem;font-weight:600;color:var(--accent);margin:1.8rem 0 .6rem}
+
+p{margin:.9rem 0}
+strong{color:var(--ink-heading);font-weight:600}
+
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+a:hover{border-bottom-color:var(--accent)}
+
+/* Inline + block code */
+code{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--code-bg);
+  color:var(--code-ink);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:.85em;
+  font-weight:500;
+  border:1px solid #e2e8f0;
+}
+pre{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--pre-bg);
+  color:var(--pre-ink);
+  padding:1.1rem 1.3rem;
+  border-radius:8px;
+  overflow-x:auto;
+  font-size:.84em;
+  line-height:1.6;
+  margin:1.2rem 0;
+  box-shadow:var(--shadow);
+}
+pre code{background:none;color:inherit;padding:0;border:none;font-size:1em;font-weight:400}
+
+/* Lists */
+ul,ol{padding-left:1.6rem;margin:.7rem 0 1rem}
+li{margin:.3rem 0}
+li::marker{color:var(--accent)}
+
+/* Blockquote */
+blockquote{
+  border-left:3px solid var(--accent);
+  background:var(--accent-soft);
+  margin:1.2rem 0;
+  padding:.7rem 1.2rem;
+  border-radius:0 6px 6px 0;
+  color:var(--ink);
+}
+blockquote p:first-child{margin-top:0}
+blockquote p:last-child{margin-bottom:0}
+
+/* Tables */
+table{
+  border-collapse:separate;
+  border-spacing:0;
+  margin:1.4rem 0;
+  font-size:.93em;
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+thead{background:#0f172a;color:#f8fafc}
+th{padding:.6rem .9rem;text-align:left;font-weight:600;font-size:.88em;letter-spacing:.01em}
+td{padding:.55rem .9rem;border-top:1px solid var(--border);vertical-align:top}
+tbody tr:nth-child(even){background:#f8fafc}
+
+hr{border:none;border-top:1px solid var(--rule);margin:2.4rem 0}
+
+/* Footer */
+footer.foot{
+  max-width:1440px;
+  margin:3rem auto 2rem;
+  padding:1.5rem 2rem;
+  color:var(--muted);
+  font-size:.85rem;
+  border-top:1px solid var(--border);
+  text-align:center;
+  font-family:'Lora',serif;
+  font-style:italic;
+}
+</style>
+</head>
+<body>
+
+<header class="brand">
+  <div class="inner">
+    <div class="eyebrow">Architecture</div>
+    <h1 class="brand-title">DataHub: the domain model</h1>
+    <p class="tagline">URNs, aspects, and Kafka — and how they fit
+together.</p>
+  </div>
+</header>
+
+<div class="layout">
+    <ul>
+    <li><a href="#datahub-the-domain-model"
+    id="toc-datahub-the-domain-model">DataHub — the domain model</a>
+    <ul>
+    <li><a href="#the-core-idea" id="toc-the-core-idea">The core
+    idea</a></li>
+    <li><a href="#the-standard-envelope"
+    id="toc-the-standard-envelope">The standard envelope</a></li>
+    <li><a href="#the-entity-types" id="toc-the-entity-types">The entity
+    types</a></li>
+    <li><a href="#aspect-categories" id="toc-aspect-categories">Aspect
+    categories</a></li>
+    <li><a href="#lineage-as-a-graph"
+    id="toc-lineage-as-a-graph">Lineage as a graph</a></li>
+    <li><a href="#pipelines-as-dataflow-datajob"
+    id="toc-pipelines-as-dataflow-datajob">Pipelines as DataFlow +
+    DataJob</a></li>
+    <li><a href="#data-quality-assertions"
+    id="toc-data-quality-assertions">Data quality (Assertions)</a></li>
+    <li><a href="#governance-entities"
+    id="toc-governance-entities">Governance entities</a></li>
+    <li><a href="#persistence-layer"
+    id="toc-persistence-layer">Persistence layer</a></li>
+    <li><a href="#the-api-surface" id="toc-the-api-surface">The API
+    surface</a></li>
+    <li><a href="#why-this-shape" id="toc-why-this-shape">Why this
+    shape</a></li>
+    <li><a href="#mental-shortcut" id="toc-mental-shortcut">Mental
+    shortcut</a></li>
+    </ul></li>
+    </ul>
+    <main>
+  <h1 id="datahub-the-domain-model">DataHub — the domain model</h1>
+  <p>Once the aspect model clicks, every API call, UI tab, and connector
+  lands in a predictable place.</p>
+  <h2 id="the-core-idea">The core idea</h2>
+  <p>DataHub doesn’t store entities as single JSON documents. An
+  <strong>Entity</strong> is a URN plus a collection of
+  independently-versioned <strong>Aspects</strong> — small typed
+  fragments. A Dataset isn’t a row; it’s the sum of whatever aspects
+  have been attached: <code>datasetProperties</code>,
+  <code>schemaMetadata</code>, <code>ownership</code>,
+  <code>glossaryTerms</code>, <code>globalTags</code>,
+  <code>datasetProfile</code>, <code>upstreamLineage</code>, and so
+  on.</p>
+  <p>This is the design decision that ripples through everything else.
+  Two independent producers can update two independent aspects on the
+  same entity without colliding. The search index updater is just
+  another aspect consumer subscribed to the same Kafka topic. Versioning
+  is per-aspect, not per-entity — a description change bumps
+  <code>datasetProperties</code> v=12 → v=13 while leaving
+  <code>schemaMetadata</code> at v=4. Schema evolution is additive: new
+  aspects can be defined and start landing without breaking existing
+  producers.</p>
+  <h2 id="the-standard-envelope">The standard envelope</h2>
+  <p>Every Entity carries:</p>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Field</th>
+  <th>Meaning</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>URN</td>
+  <td><code>urn:li:&lt;entityType&gt;:(...)</code> — globally unique,
+  encodes the entity’s type and identity</td>
+  </tr>
+  <tr>
+  <td>Aspects</td>
+  <td>One or more typed records attached to this URN</td>
+  </tr>
+  <tr>
+  <td>Version (per aspect)</td>
+  <td>Monotonic counter; v=0 is the latest, prior versions retained for
+  history</td>
+  </tr>
+  <tr>
+  <td>AuditStamp (per aspect)</td>
+  <td><code>{time, actor}</code> recording who wrote this aspect
+  when</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>The URN format is verbose but deterministic:</p>
+  <pre><code>urn:li:dataset:(urn:li:dataPlatform:snowflake,db.schema.table,PROD)
+urn:li:dataFlow:(airflow,my_dag,PROD)
+urn:li:dataJob:(urn:li:dataFlow:(airflow,my_dag,PROD),my_task)
+urn:li:assertion:abc123
+urn:li:corpuser:datahub</code></pre>
+  <p>Platform + name + environment are encoded into the identity.
+  Environment (<code>PROD</code>, <code>DEV</code>,
+  <code>STAGING</code>) is first-class, not a tag.</p>
+  <h2 id="the-entity-types">The entity types</h2>
+  <p>Entities are defined in Pegasus schemas and the catalog grows
+  release by release. The current canon:</p>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Category</th>
+  <th>Entities</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>Data assets</td>
+  <td>Dataset, Container, Chart, Dashboard, MLModel, MLFeature,
+  MLModelGroup, MLFeatureTable, MLPrimaryKey</td>
+  </tr>
+  <tr>
+  <td>Pipelines</td>
+  <td>DataFlow (a flow / DAG), DataJob (a task inside a flow),
+  DataProcessInstance (a run)</td>
+  </tr>
+  <tr>
+  <td>Schema</td>
+  <td>DataPlatform, DataPlatformInstance</td>
+  </tr>
+  <tr>
+  <td>People</td>
+  <td>CorpUser, CorpGroup, Role</td>
+  </tr>
+  <tr>
+  <td>Governance</td>
+  <td>Tag, GlossaryTerm, GlossaryNode, Domain, DataProduct,
+  BusinessAttribute</td>
+  </tr>
+  <tr>
+  <td>Quality</td>
+  <td>Assertion, Test, Incident</td>
+  </tr>
+  <tr>
+  <td>Operational</td>
+  <td>Notebook, Query, SchemaField</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>Each entity type defines which aspects it accepts. A Dataset
+  accepts <code>datasetProperties</code>, <code>schemaMetadata</code>,
+  <code>ownership</code>, <code>glossaryTerms</code>,
+  <code>globalTags</code>, <code>upstreamLineage</code>,
+  <code>datasetProfile</code>, <code>assertions</code>,
+  <code>domains</code>, <code>datasetUsageStatistics</code>,
+  <code>editableDatasetProperties</code>, <code>status</code>,
+  <code>siblings</code>, and more. An Assertion accepts
+  <code>assertionInfo</code>, <code>assertionRunEvent</code>,
+  <code>ownership</code>, <code>status</code>.</p>
+  <h2 id="aspect-categories">Aspect categories</h2>
+  <p>Aspects fall into rough groups:</p>
+  <table>
+  <colgroup>
+  <col style="width: 33%" />
+  <col style="width: 33%" />
+  <col style="width: 33%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Group</th>
+  <th>Examples</th>
+  <th>Notes</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>Identity / definition</td>
+  <td><code>datasetProperties</code>, <code>schemaMetadata</code>,
+  <code>dataJobInfo</code>, <code>dataFlowInfo</code></td>
+  <td>The “what is this” aspects</td>
+  </tr>
+  <tr>
+  <td>Relationships</td>
+  <td><code>upstreamLineage</code>, <code>dataJobInputOutput</code>,
+  <code>containedIn</code>, <code>siblings</code></td>
+  <td>Edges to other URNs</td>
+  </tr>
+  <tr>
+  <td>Governance</td>
+  <td><code>ownership</code>, <code>globalTags</code>,
+  <code>glossaryTerms</code>, <code>domains</code>,
+  <code>dataProducts</code></td>
+  <td>Cross-cutting concerns</td>
+  </tr>
+  <tr>
+  <td>Operational</td>
+  <td><code>status</code>, <code>datasetProfile</code>,
+  <code>datasetUsageStatistics</code>,
+  <code>assertionRunEvent</code></td>
+  <td>Runtime / time-series data</td>
+  </tr>
+  <tr>
+  <td>Editorial</td>
+  <td><code>editableDatasetProperties</code>,
+  <code>institutionalMemory</code></td>
+  <td>UI-edited overlays that don’t get clobbered by ingestion</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>The split between <code>datasetProperties</code> (from ingestion)
+  and <code>editableDatasetProperties</code> (from UI edits) is one of
+  DataHub’s quieter clever bits — it solves the “every re-ingest
+  clobbers the description I just wrote” problem cleanly.</p>
+  <h2 id="lineage-as-a-graph">Lineage as a graph</h2>
+  <p>Lineage isn’t an aspect attached only to datasets. It’s a graph
+  that overlays the entity tree, populated primarily by the
+  <code>upstreamLineage</code> aspect on whichever entity is downstream.
+  Edge structure:</p>
+  <table>
+  <thead>
+  <tr>
+  <th>Field</th>
+  <th>What it is</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><code>dataset</code></td>
+  <td>The upstream URN (any entity type, not just Dataset)</td>
+  </tr>
+  <tr>
+  <td><code>type</code></td>
+  <td><code>TRANSFORMED</code>, <code>COPY</code>, <code>VIEW</code>,
+  etc.</td>
+  </tr>
+  <tr>
+  <td><code>auditStamp</code></td>
+  <td>When and who recorded this edge</td>
+  </tr>
+  <tr>
+  <td><code>properties</code></td>
+  <td>Optional metadata about the edge itself</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>Column-level lineage lives in a separate
+  <code>fineGrainedLineages</code> field on the same aspect: a list of
+  <code>{upstreamFields, downstreamFields, transformOperation}</code>
+  mappings.</p>
+  <p>Any entity type can be at either end of an edge. The graph store
+  renders heterogeneous nodes — Tables → Dashboards, Pipelines → ML
+  Models, Topics → Tables — in one view.</p>
+  <h2 id="pipelines-as-dataflow-datajob">Pipelines as DataFlow +
+  DataJob</h2>
+  <p>The pipeline model uses two entities, not one:</p>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Entity</th>
+  <th>Role</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>DataFlow</td>
+  <td>A pipeline service or DAG. URN encodes the orchestrator (airflow,
+  spark, dagster). Holds <code>dataFlowInfo</code>,
+  <code>ownership</code>.</td>
+  </tr>
+  <tr>
+  <td>DataJob</td>
+  <td>A task / executable within a flow. URN nests the parent DataFlow
+  URN. Holds <code>dataJobInfo</code>, <code>dataJobInputOutput</code>
+  (declaring upstream and downstream datasets + upstream jobs),
+  <code>ownership</code>, <code>globalTags</code>.</td>
+  </tr>
+  <tr>
+  <td>DataProcessInstance</td>
+  <td>A single run of a DataJob (optional). Carries start/end time,
+  status.</td>
+  </tr>
+  </tbody>
+  </table>
+  <p><code>dataJobInputOutput</code> is what tells DataHub which
+  datasets feed this job and which it produces, allowing the lineage
+  view to render pipelines as nodes between data assets.</p>
+  <h2 id="data-quality-assertions">Data quality (Assertions)</h2>
+  <p>Assertions are first-class entities, not children of a test
+  suite:</p>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Aspect</th>
+  <th>Purpose</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><code>assertionInfo</code></td>
+  <td>Definition: dataset URN, scope (DATASET / DATASET_COLUMN), fields,
+  operator (<code>NOT_NULL</code>, <code>BETWEEN</code>,
+  <code>EQUAL_TO</code>…), parameters, source (NATIVE / EXTERNAL /
+  GREAT_EXPECTATIONS / SODA)</td>
+  </tr>
+  <tr>
+  <td><code>assertionRunEvent</code></td>
+  <td>Time-series of runs, each with status (COMPLETE / RUNNING /
+  FAILURE) and result (SUCCESS / FAILURE / ERROR), plus observed
+  values</td>
+  </tr>
+  <tr>
+  <td><code>ownership</code></td>
+  <td>Who owns this assertion</td>
+  </tr>
+  <tr>
+  <td><code>status</code></td>
+  <td>Soft-delete flag</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>Native and external (GX, Soda) assertions share the same schema.
+  The UI surfaces all of them the same way, with status badges on the
+  dataset’s lineage node and detailed run histories on the dataset’s
+  “Quality” tab.</p>
+  <h2 id="governance-entities">Governance entities</h2>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Entity</th>
+  <th>What it represents</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>CorpUser, CorpGroup</td>
+  <td>People and teams; attached to anything via the
+  <code>ownership</code> aspect</td>
+  </tr>
+  <tr>
+  <td>Tag</td>
+  <td>A label; attached via <code>globalTags</code>. Tiers are tags by
+  convention (<code>urn:li:tag:Tier1</code>)</td>
+  </tr>
+  <tr>
+  <td>GlossaryTerm</td>
+  <td>Hierarchical business vocabulary; attached via
+  <code>glossaryTerms</code></td>
+  </tr>
+  <tr>
+  <td>Domain</td>
+  <td>Business grouping; attached via <code>domains</code>. Assets
+  belong to one domain</td>
+  </tr>
+  <tr>
+  <td>DataProduct</td>
+  <td>Consumer-facing bundle of assets</td>
+  </tr>
+  <tr>
+  <td>Role / Policy</td>
+  <td>Permission grants; attached to users/groups</td>
+  </tr>
+  </tbody>
+  </table>
+  <h2 id="persistence-layer">Persistence layer</h2>
+  <table>
+  <colgroup>
+  <col style="width: 33%" />
+  <col style="width: 33%" />
+  <col style="width: 33%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Store</th>
+  <th>Role</th>
+  <th>What it holds</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>MySQL (or Postgres)</td>
+  <td>Source of truth</td>
+  <td>One row per (URN, aspectName, version) — the entire history of
+  every aspect on every entity</td>
+  </tr>
+  <tr>
+  <td>Kafka</td>
+  <td>Event bus</td>
+  <td>Topics like <code>MetadataChangeLog_v1</code> carrying every
+  aspect mutation. Multiple consumers subscribe</td>
+  </tr>
+  <tr>
+  <td>Elasticsearch</td>
+  <td>Derived projection</td>
+  <td>Reindexed by a Kafka consumer on every aspect change. Powers
+  search, type-ahead, the Insights view</td>
+  </tr>
+  <tr>
+  <td>Neo4j (or MySQL graph mode)</td>
+  <td>Lineage graph</td>
+  <td>Reindexed by a Kafka consumer when lineage aspects change. Powers
+  the lineage walks</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>The pattern is uniform: MySQL holds truth, Kafka carries change
+  events, and every derived view is a consumer that can be rebuilt from
+  scratch by replaying the topic. The trade-off is operational weight —
+  Kafka and Neo4j are not optional.</p>
+  <h2 id="the-api-surface">The API surface</h2>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Endpoint</th>
+  <th>Purpose</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><code>GET /api/graphql</code></td>
+  <td>Primary read surface; ask for an entity and its aspects in one
+  shot</td>
+  </tr>
+  <tr>
+  <td><code>POST /aspects?action=ingestProposal</code></td>
+  <td>Write any aspect on any entity — the universal write endpoint</td>
+  </tr>
+  <tr>
+  <td><code>GET /entities/{urn}</code></td>
+  <td>Restli read; entity envelope + aspects</td>
+  </tr>
+  <tr>
+  <td><code>POST /openapi/v3/entity/{type}</code></td>
+  <td>OpenAPI write surface (newer, friendlier than Restli)</td>
+  </tr>
+  <tr>
+  <td><code>GET /openapi/v3/entity/{type}/{urn}/{aspect}</code></td>
+  <td>OpenAPI read of one aspect</td>
+  </tr>
+  <tr>
+  <td><code>POST /relationships?action=findRelated</code></td>
+  <td>Graph queries</td>
+  </tr>
+  <tr>
+  <td><code>POST /search?action=search</code></td>
+  <td>Direct ES search</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>The OpenAPI v3 endpoints are the easier on-ramp for scripting; the
+  Restli endpoints are the legacy primary surface, still used by every
+  Python SDK call under the hood.</p>
+  <h2 id="why-this-shape">Why this shape</h2>
+  <p>Three design decisions explain the whole platform:</p>
+  <ol type="1">
+  <li><p><strong>Aspects, not documents.</strong> Producers and
+  consumers decouple at the aspect boundary. A Spark job emits
+  <code>upstreamLineage</code>; an Airflow recipe emits
+  <code>dataJobInfo</code>; a GX run emits
+  <code>assertionRunEvent</code>. Three independent producers writing to
+  the same Dataset URN, never colliding.</p></li>
+  <li><p><strong>Kafka as the metadata bus.</strong> Every aspect
+  mutation publishes a typed event. Search, lineage, alerting,
+  downstream integrations all subscribe. This is what makes DataHub
+  fundamentally event-driven rather than request-driven.</p></li>
+  <li><p><strong>Versioning per aspect.</strong> A description edit
+  doesn’t bump the schema’s version. History is granular, audit logs are
+  precise, rollbacks are surgical.</p></li>
+  </ol>
+  <p>The cost is operational. Six-plus containers, Kafka and a graph
+  store to run, MySQL alongside ES — all things that have to stay up,
+  get backed up, and scale together. DataHub is not the lightweight
+  option.</p>
+  <h2 id="mental-shortcut">Mental shortcut</h2>
+  <p>When stuck on “how do I do X in DataHub”, three questions land most
+  tasks:</p>
+  <ol type="1">
+  <li><strong>What entity type and URN?</strong>
+  (<code>urn:li:dataset:(...)</code>, <code>urn:li:dataJob:(...)</code>,
+  etc.)</li>
+  <li><strong>Which aspect carries the data?</strong>
+  (<code>ownership</code>? <code>datasetProfile</code>?
+  <code>upstreamLineage</code>?)</li>
+  <li><strong>Read or write?</strong> (GraphQL for reads;
+  <code>ingestProposal</code> with the aspect payload for writes.)</li>
+  </ol>
+  <p>The aspect taxonomy is the catalog of capabilities. Once it’s
+  mapped, the API and UI follow.</p>
+  </main>
+</div>
+
+<footer class="foot">openmetadata · poc notes</footer>
+
+<script>
+// Smooth-scroll active TOC link
+document.addEventListener('DOMContentLoaded', () => {
+  const tocLinks = document.querySelectorAll('nav#TOC a[href^="#"]');
+  if (!tocLinks.length) return;
+  const targets = Array.from(tocLinks).map(a => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+  const linkFor = new Map();
+  tocLinks.forEach(a => linkFor.set(a.getAttribute('href').slice(1), a));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const id = e.target.id;
+      const link = linkFor.get(id);
+      if (!link) return;
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  targets.forEach(t => obs.observe(t));
+});
+</script>
+</body>
+</html>
