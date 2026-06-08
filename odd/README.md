@@ -41,7 +41,7 @@ export OMD_JWT=<paste-token-here>
 ## 4. Run the Spark job (Acceptance item 2)
 
 ```bash
-JAVA_HOME=/opt/homebrew/opt/openjdk@21 sbt 'runMain com.poc.omd.BuildSensorProfiles \
+JAVA_HOME=/opt/homebrew/opt/openjdk@21 sbt 'runMain com.poc.odd.BuildSensorProfiles \
   --input-path sample-data/sensor_readings.csv \
   --output-path /tmp/sensor_profiles.parquet'
 ```
@@ -79,7 +79,7 @@ Six component tests cover both jobs' logic (no OMD stack required).
 Run `BuildSensorProfiles` first (step 4) to produce `sensor_profiles.parquet`, then:
 
 ```bash
-JAVA_HOME=/opt/homebrew/opt/openjdk@21 sbt 'runMain com.poc.omd.EnrichWithZoneLabel \
+JAVA_HOME=/opt/homebrew/opt/openjdk@21 sbt 'runMain com.poc.odd.EnrichWithZoneLabel \
   --sensor-profiles-path /tmp/sensor_profiles.parquet \
   --zone-lookup-path sample-data/zone_lookup.csv \
   --output-path /tmp/sensor_profiles_enriched.parquet'
