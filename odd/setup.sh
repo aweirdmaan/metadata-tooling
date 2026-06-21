@@ -72,6 +72,8 @@ export ODD_TOKEN
 echo "[3/4] Pushing entities, lineage, and JOB_RUN events..."
 ./scripts/seed-odd.sh
 ./scripts/populate-metadata.sh || true   # tolerates ODD's spec limits on JOB_RUN parents
+./scripts/seed-dq.sh
+./scripts/enrich-ui.sh
 
 # ---------------------------------------------------------------------------
 # Done
