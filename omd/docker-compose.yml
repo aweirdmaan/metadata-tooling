@@ -1,0 +1,130 @@
+# OMD 1.12.x — official postgres backend compose
+# Source: https://github.com/open-metadata/OpenMetadata/releases/tag/1.12.0-release
+# ES memory capped per EDA notes (prevents OOM restart loop on Docker Desktop)
+version: "3.9"
+
+volumes:
+  ingestion-volume-dag-airflow:
+  ingestion-volume-tmp:
+  ingestion-volume-dags:
+  es-data:
+  db-data:
+
+networks:
+  app_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: "172.16.240.0/24"
+
+services:
+  postgresql:
+    container_name: openmetadata_postgresql
+    image: docker.io/openmetadata/postgresql:1.12.0
+    restart: always
+    environment:
+      POSTGRES_USER: openmetadata_user
+      POSTGRES_PASSWORD: openmetadata_password
+    expose:
+      - 5432
+    ports:
+      - "5432:5432"
+    networks:
+      - app_net
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U openmetadata_user"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+
+  elasticsearch:
+    container_name: openmetadata_elasticsearch
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.4
+    environment:
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+      - xpack.security.enabled=false
+    networks:
+      - app_net
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+
+  openmetadata-server:
+    container_name: openmetadata_server
+    restart: always
+    image: docker.io/openmetadata/server:1.12.0
+    environment:
+      OPENMETADATA_CLUSTER_NAME: openmetadata
+      LOG_LEVEL: INFO
+      OPENMETADATA_HEAP: "-Xms1g -Xmx1g"
+      # Database
+      DB_DRIVER_CLASS: org.postgresql.Driver
+      DB_SCHEME: postgresql
+      DB_USE_SSL: "false"
+      DB_USER: openmetadata_user
+      DB_USER_PASSWORD: openmetadata_password
+      DB_HOST: postgresql
+      DB_PORT: 5432
+      OM_DATABASE: openmetadata_db
+      # Elasticsearch
+      SEARCH_TYPE: elasticsearch
+      ELASTICSEARCH_HOST: elasticsearch
+      ELASTICSEARCH_PORT: 9200
+      ELASTICSEARCH_SCHEME: http
+      # Auth
+      AUTHENTICATION_PROVIDER: basic
+      AUTHORIZER_ENABLE_SECURE_SOCKET: "false"
+    ports:
+      - "8585:8585"
+      - "8586:8586"
+    networks:
+      - app_net
+    depends_on:
+      postgresql:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:8585/api/v1/system/status | grep -q 'ok\\|healthy'"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
+
+  openmetadata-ingestion:
+    container_name: openmetadata_ingestion
+    image: docker.io/openmetadata/ingestion:1.12.0
+    depends_on:
+      openmetadata-server:
+        condition: service_healthy
+    environment:
+      AIRFLOW__API__AUTH_BACKENDS: airflow.api.auth.backend.basic_auth
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__OPENMETADATA_AIRFLOW_APIS__DAG_GENERATED_CONFIGS: /opt/airflow/dag_generated_configs
+      OPENMETADATA_SERVER_HOST_NAME: openmetadata-server
+      OPENMETADATA_SERVER_PORT: 8585
+      OPENMETADATA_SERVER_PIPELINE_SERVICE_CLIENT_ENDPOINT: http://openmetadata-server:8585
+    ports:
+      - "8080:8080"
+    networks:
+      - app_net
+    volumes:
+      - ingestion-volume-dag-airflow:/opt/airflow/dag_generated_configs
+      - ingestion-volume-tmp:/tmp
+      - ingestion-volume-dags:/opt/airflow/dags
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8080/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 120s
