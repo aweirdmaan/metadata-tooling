@@ -24,6 +24,15 @@ cd odd     && ./setup.sh
 
 Each `setup.sh` is idempotent.
 
+### One manual step (OMD only)
+
+OMD's seed scripts authenticate as the `ingestion-bot` service account, whose JWT is generated when the server boots and can only be retrieved from the UI. Two phases:
+
+1. `cd omd && ./setup.sh` — brings the stack up, then pauses at the JWT prompt.
+2. Open <http://localhost:8585>, login `admin@open-metadata.org` / `admin`, go to **Settings → Bots → ingestion-bot → Token**, copy the `ey…` string, paste it back at the prompt.
+
+Re-running with `OMD_JWT="ey…" ./setup.sh` skips the prompt entirely. DataHub and ODD don't need this — their setup scripts handle auth themselves.
+
 ## Documentation
 
 - [`omd/docs/omd-capability-brief.html`](./omd/docs/omd-capability-brief.html) — what OpenMetadata does

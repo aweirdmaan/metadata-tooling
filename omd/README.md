@@ -2,6 +2,28 @@
 
 OpenMetadata local stack + Spark job demonstrating lineage from a raw CSV to a derived parquet table.
 
+## TL;DR
+
+```bash
+./setup.sh
+```
+
+That brings up the stack, fetches the Spark agent jar, pauses for the **ingestion-bot JWT** (one manual step — see below), then runs both Spark jobs and seeds entities + lineage + DQ + governance metadata. Re-runnable.
+
+### The one manual step — JWT
+
+OMD's seed scripts authenticate as the `ingestion-bot` service account. Its JWT is generated when the server boots and can only be retrieved from the UI:
+
+1. Open <http://localhost:8585>, login `admin@open-metadata.org` / `admin`
+2. **Settings → Bots → ingestion-bot → Token** → click the eye to reveal, copy the `ey…` string
+3. Paste at the `setup.sh` prompt (or pre-export: `OMD_JWT="ey…" ./setup.sh`)
+
+Once exported, the second run skips the prompt and the seed scripts run straight through.
+
+---
+
+The rest of this README explains what `setup.sh` does, step-by-step, in case you want to run any of the phases manually.
+
 ## Prerequisites
 
 - Docker Desktop (≥ 6 GiB / 4 vCPUs allocated)
