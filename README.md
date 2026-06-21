@@ -1,0 +1,43 @@
+# Metadata tooling — three catalog POCs
+
+Three side-by-side POCs of the same Scala/Spark pipeline against three open-source data catalogs.
+
+## Layout
+
+| Folder | Catalog | UI |
+|---|---|---|
+| [`omd/`](./omd) | OpenMetadata 1.12 | http://localhost:8585 |
+| [`datahub/`](./datahub) | DataHub (Acryl quickstart) | http://localhost:9002 |
+| [`odd/`](./odd) | Open Data Discovery Platform | http://localhost:8090 |
+
+Each subdirectory is a self-contained POC with its own `setup.sh`, Scala/sbt project, seed scripts, and docs.
+
+## Quick start
+
+```bash
+./setup-all.sh                  # interactive picker
+# or
+cd omd     && ./setup.sh
+cd datahub && ./setup.sh
+cd odd     && ./setup.sh
+```
+
+Each `setup.sh` is idempotent.
+
+## Documentation
+
+- [`omd/docs/omd-capability-brief.html`](./omd/docs/omd-capability-brief.html) — what OpenMetadata does
+- [`omd/docs/omd-domain-model.html`](./omd/docs/omd-domain-model.html) — OMD entity model
+- [`datahub/docs/datahub-capability-brief.html`](./datahub/docs/datahub-capability-brief.html) — what DataHub does
+- [`datahub/docs/datahub-domain-model.html`](./datahub/docs/datahub-domain-model.html) — DataHub aspect model
+- [`odd/docs/odd-capability-brief.html`](./odd/docs/odd-capability-brief.html) — what ODD does
+- [`odd/docs/odd-domain-model.html`](./odd/docs/odd-domain-model.html) — ODD spec-first model
+- [`comparison.html`](./comparison.html) — side-by-side comparison of all three
+
+## Port conflicts
+
+OMD's Elasticsearch and DataHub's OpenSearch both bind `:9200`. Run one catalog at a time, or remap.
+
+## History
+
+Each POC's history is preserved under its subdirectory, merged via `git filter-repo --to-subdirectory-filter`. Use `git log -- omd/` (or `datahub/`, `odd/`) to walk the slice-by-slice commits for one POC.

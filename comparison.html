@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catalog comparison</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:           #fafaf7;
+  --surface:      #ffffff;
+  --ink:          #1f2937;
+  --ink-heading:  #0f172a;
+  --muted:        #64748b;
+  --accent:       #0e7490;
+  --accent-soft:  #ecfeff;
+  --accent-hover: #0891b2;
+  --border:       #e5e7eb;
+  --rule:         #d1d5db;
+  --code-bg:      #f1f5f9;
+  --code-ink:     #334155;
+  --pre-bg:       #0f172a;
+  --pre-ink:      #e2e8f0;
+  --shadow:       0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  font-size:16px;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Layout */
+.layout{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  max-width:1440px;
+  margin:0 auto;
+  gap:3rem;
+  padding:0 2rem;
+}
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr;gap:0}
+  nav#TOC{position:static !important;max-height:none !important;border-right:none;border-bottom:1px solid var(--border);padding:1rem 0 1.5rem !important}
+}
+
+/* Header band */
+header.brand{
+  background:linear-gradient(135deg, #0f172a 0%, #0e7490 100%);
+  color:#fff;
+  padding:2.4rem 2rem 2rem;
+  margin-bottom:3rem;
+}
+header.brand .inner{
+  max-width:1440px;
+  margin:0 auto;
+  padding:0 0rem;
+}
+header.brand .eyebrow{
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  opacity:.75;
+  margin-bottom:.4rem;
+  font-weight:500;
+}
+header.brand h1.brand-title{
+  font-size:2.4rem;
+  font-weight:700;
+  letter-spacing:-0.02em;
+  margin:0 0 .3rem;
+  border:none;
+  color:#fff;
+}
+header.brand .tagline{
+  color:#cffafe;
+  font-family:'Lora', serif;
+  font-style:italic;
+  font-size:1.05rem;
+  margin:0;
+  opacity:.95;
+}
+
+/* TOC sidebar */
+nav#TOC{
+  position:sticky;
+  top:1.5rem;
+  align-self:start;
+  padding:1.5rem 0;
+  max-height:calc(100vh - 3rem);
+  overflow-y:auto;
+  font-size:.88rem;
+  border-right:1px solid var(--border);
+  padding-right:1.4rem;
+}
+nav#TOC::-webkit-scrollbar{width:6px}
+nav#TOC::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+nav#TOC ul{
+  list-style:none;
+  padding-left:0;
+  margin:0;
+}
+nav#TOC > ul > li{margin-bottom:.3rem}
+nav#TOC ul ul{padding-left:1rem;margin-top:.2rem}
+nav#TOC a{
+  color:var(--muted);
+  text-decoration:none;
+  display:block;
+  padding:.25rem .6rem;
+  border-radius:5px;
+  border-left:2px solid transparent;
+  transition:all .15s ease;
+  font-weight:500;
+}
+nav#TOC a:hover{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+}
+nav#TOC a.active{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+  font-weight:600;
+}
+
+/* Main content */
+main{
+  max-width:920px;
+  padding:.5rem 0 4rem;
+}
+main h1:first-child{display:none}
+
+/* Typography */
+h1,h2,h3,h4{
+  color:var(--ink-heading);
+  letter-spacing:-0.015em;
+  scroll-margin-top:1.5rem;
+}
+h1{font-size:2.1rem;font-weight:700;margin:0 0 1.4rem;padding-bottom:.5rem;border-bottom:3px solid var(--accent)}
+h2{font-size:1.5rem;font-weight:600;margin:2.6rem 0 .8rem;padding-bottom:.35rem;border-bottom:1px solid var(--rule)}
+h3{font-size:1.15rem;font-weight:600;color:var(--accent);margin:1.8rem 0 .6rem}
+
+p{margin:.9rem 0}
+strong{color:var(--ink-heading);font-weight:600}
+
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+a:hover{border-bottom-color:var(--accent)}
+
+/* Inline + block code */
+code{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--code-bg);
+  color:var(--code-ink);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:.85em;
+  font-weight:500;
+  border:1px solid #e2e8f0;
+}
+pre{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--pre-bg);
+  color:var(--pre-ink);
+  padding:1.1rem 1.3rem;
+  border-radius:8px;
+  overflow-x:auto;
+  font-size:.84em;
+  line-height:1.6;
+  margin:1.2rem 0;
+  box-shadow:var(--shadow);
+}
+pre code{background:none;color:inherit;padding:0;border:none;font-size:1em;font-weight:400}
+
+/* Lists */
+ul,ol{padding-left:1.6rem;margin:.7rem 0 1rem}
+li{margin:.3rem 0}
+li::marker{color:var(--accent)}
+
+/* Blockquote */
+blockquote{
+  border-left:3px solid var(--accent);
+  background:var(--accent-soft);
+  margin:1.2rem 0;
+  padding:.7rem 1.2rem;
+  border-radius:0 6px 6px 0;
+  color:var(--ink);
+}
+blockquote p:first-child{margin-top:0}
+blockquote p:last-child{margin-bottom:0}
+
+/* Tables */
+table{
+  border-collapse:separate;
+  border-spacing:0;
+  margin:1.4rem 0;
+  font-size:.93em;
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+thead{background:#0f172a;color:#f8fafc}
+th{padding:.6rem .9rem;text-align:left;font-weight:600;font-size:.88em;letter-spacing:.01em}
+td{padding:.55rem .9rem;border-top:1px solid var(--border);vertical-align:top}
+tbody tr:nth-child(even){background:#f8fafc}
+
+hr{border:none;border-top:1px solid var(--rule);margin:2.4rem 0}
+
+/* Footer */
+footer.foot{
+  max-width:1440px;
+  margin:3rem auto 2rem;
+  padding:1.5rem 2rem;
+  color:var(--muted);
+  font-size:.85rem;
+  border-top:1px solid var(--border);
+  text-align:center;
+  font-family:'Lora',serif;
+  font-style:italic;
+}
+</style>
+</head>
+<body>
+
+<header class="brand">
+  <div class="inner">
+    <div class="eyebrow">Side by side</div>
+    <h1 class="brand-title">Three catalogs, three different bets</h1>
+    <p class="tagline">OpenMetadata, DataHub, and Open Data Discovery —
+what each picks and what falls out.</p>
+  </div>
+</header>
+
+<div class="layout">
+    <ul>
+    <li><a href="#three-catalogs-three-different-bets"
+    id="toc-three-catalogs-three-different-bets">Three catalogs, three
+    different bets</a>
+    <ul>
+    <li><a href="#the-headline" id="toc-the-headline">The
+    headline</a></li>
+    <li><a href="#why-product-vs-platform-vs-protocol-matters"
+    id="toc-why-product-vs-platform-vs-protocol-matters">Why “product vs
+    platform vs protocol” matters</a></li>
+    <li><a href="#how-they-shape-spark-lineage"
+    id="toc-how-they-shape-spark-lineage">How they shape Spark
+    lineage</a></li>
+    <li><a href="#how-they-shape-data-quality"
+    id="toc-how-they-shape-data-quality">How they shape data
+    quality</a></li>
+    <li><a href="#how-they-shape-governance"
+    id="toc-how-they-shape-governance">How they shape
+    governance</a></li>
+    <li><a href="#how-they-shape-evolution"
+    id="toc-how-they-shape-evolution">How they shape evolution</a></li>
+    <li><a href="#what-this-poc-actually-showed"
+    id="toc-what-this-poc-actually-showed">What this POC actually
+    showed</a></li>
+    <li><a href="#picking-between-them"
+    id="toc-picking-between-them">Picking between them</a></li>
+    </ul></li>
+    </ul>
+    <main>
+  <h1 id="three-catalogs-three-different-bets">Three catalogs, three
+  different bets</h1>
+  <p>OpenMetadata, DataHub, and Open Data Discovery solve the same
+  headline problem — give a data platform a single searchable surface
+  for every asset, with lineage and quality on top — and pick three
+  genuinely different architectures to do it. This is what each picks,
+  and what falls out as a consequence.</p>
+  <hr />
+  <h2 id="the-headline">The headline</h2>
+  <table>
+  <colgroup>
+  <col style="width: 25%" />
+  <col style="width: 25%" />
+  <col style="width: 25%" />
+  <col style="width: 25%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th></th>
+  <th>OpenMetadata</th>
+  <th>DataHub</th>
+  <th>Open Data Discovery</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>Treats the catalog as</td>
+  <td>A product</td>
+  <td>A platform</td>
+  <td>A protocol</td>
+  </tr>
+  <tr>
+  <td>Unit of metadata</td>
+  <td>One JSON document per entity</td>
+  <td>Independently-versioned aspects</td>
+  <td>One DataEntity envelope per OddRN</td>
+  </tr>
+  <tr>
+  <td>Identity</td>
+  <td><code>service.db.schema.table</code> (FQN)</td>
+  <td><code>urn:li:dataset:(platform,name,env)</code></td>
+  <td><code>//platform/host/.../path/...</code> (OddRN)</td>
+  </tr>
+  <tr>
+  <td>Storage</td>
+  <td>Postgres + Elasticsearch</td>
+  <td>MySQL + ES + Kafka + Neo4j</td>
+  <td>Postgres only</td>
+  </tr>
+  <tr>
+  <td>Event model</td>
+  <td>Webhooks (bolted on)</td>
+  <td>Kafka (first-class)</td>
+  <td>None — schedule-driven HTTP push</td>
+  </tr>
+  <tr>
+  <td>Primary API</td>
+  <td>REST + JSON Schema</td>
+  <td>GraphQL primary; REST + OpenAPI write</td>
+  <td>REST + ODD Spec</td>
+  </tr>
+  <tr>
+  <td>Containers to operate</td>
+  <td>~4</td>
+  <td>~6 to 9</td>
+  <td>~2</td>
+  </tr>
+  <tr>
+  <td>Connector library</td>
+  <td>~80</td>
+  <td>~80+</td>
+  <td>~30</td>
+  </tr>
+  <tr>
+  <td>Runtime Spark lineage</td>
+  <td>OpenMetadata Spark Agent</td>
+  <td><code>acryl-spark-lineage</code> listener</td>
+  <td>Limited; usually pushed from a wrapper</td>
+  </tr>
+  <tr>
+  <td>Built-in DQ</td>
+  <td>~25 test types, Incident workflow</td>
+  <td>Native Assertions + GX / Soda re-uses the same model</td>
+  <td>Records external runner results; doesn’t author tests</td>
+  </tr>
+  <tr>
+  <td>Pipeline as a first-class entity</td>
+  <td>Yes (Pipeline)</td>
+  <td>Yes (DataFlow + DataJob)</td>
+  <td>No (only JOB_RUN)</td>
+  </tr>
+  <tr>
+  <td>Authored DQ test as a first-class entity</td>
+  <td>Yes (TestSuite + TestCase)</td>
+  <td>Yes (Assertion)</td>
+  <td>No</td>
+  </tr>
+  <tr>
+  <td>Column-level lineage</td>
+  <td>Yes, where producer supplies it</td>
+  <td>Yes, via fineGrainedLineages</td>
+  <td>Spec allows it; default UI doesn’t render</td>
+  </tr>
+  </tbody>
+  </table>
+  <hr />
+  <h2 id="why-product-vs-platform-vs-protocol-matters">Why “product vs
+  platform vs protocol” matters</h2>
+  <p>The three labels aren’t marketing. They describe what each tool
+  will fight for if everything else has to bend.</p>
+  <p><strong>OpenMetadata</strong> fights for a coherent user
+  experience. One team owns the connector framework, the API, the UI,
+  the agent, the embedded Airflow. New asset types ship with full UI
+  support. The trade-off: heavier opinions about how producers should
+  look. If a producer doesn’t fit OMD’s expected shape, the friction is
+  real (the Spark agent’s <code>locationPath</code> lookup, for example,
+  expects a particular file-path convention; deviate and lineage stays
+  orphaned).</p>
+  <p><strong>DataHub</strong> fights for decoupling. Aspects let
+  independent producers update non-overlapping pieces of the same entity
+  without colliding. Kafka means consumers (search, lineage, alerting,
+  external integrations) all see the same change stream. The trade-off:
+  operational weight. Kafka and Neo4j aren’t optional, and the
+  quickstart is several env vars and an init container away from
+  working.</p>
+  <p><strong>ODD</strong> fights for interop. The product is the spec,
+  not the platform. Anyone who emits ODD-shaped JSON gets ingested;
+  anyone who reads ODD-shaped JSON can consume. The platform stays small
+  because it doesn’t have to be the source of truth for every concept.
+  The trade-off: smaller feature surface. Pipelines and DQ tests aren’t
+  first-class entities; the model assumes external systems own those
+  concepts.</p>
+  <hr />
+  <h2 id="how-they-shape-spark-lineage">How they shape Spark
+  lineage</h2>
+  <p>This is one of the places the three diverge most clearly, because
+  it’s the most common “runtime metadata” producer.</p>
+  <p><strong>OpenMetadata</strong> ships an opinionated Spark Agent — a
+  <code>SparkListener</code> that posts events directly to OMD’s
+  <code>/api/v1/lineage</code> endpoint. It auto-creates pipeline
+  entities in OMD as a side effect of the job running. The catch
+  (learned the hard way during this POC): the agent looks up source /
+  sink tables by <code>locationPath</code> field via Elasticsearch. If
+  those tables don’t have a matching path indexed, lineage events post
+  successfully but orphan. Either pre-register the assets via a
+  connector that populates <code>locationPath</code> correctly, or post
+  lineage edges directly via the API.</p>
+  <p><strong>DataHub</strong> ships <code>acryl-spark-lineage</code> (a
+  Maven artifact, no separate jar download needed) which posts to GMS
+  via the REST emitter. It uses URN-based identity
+  (<code>urn:li:dataset:(urn:li:dataPlatform:file,&lt;path&gt;,PROD)</code>)
+  so as long as the URN deterministically resolves, edges land. The
+  Acryl listener also auto-creates <code>DataJob</code> entities in
+  DataHub for the Spark application, including input/output
+  declarations.</p>
+  <p><strong>ODD</strong> doesn’t have a Spark integration with the same
+  scope. There’s an <code>odd-collector-spark</code> project but it’s
+  narrower than the OMD or DataHub agents — closer to capturing job
+  catalog than fine-grained read/write lineage. The pragmatic path for
+  ODD with Spark today is to POST lineage edges directly from a wrapper
+  script, treating ODD’s ingestion API as the lowest common
+  denominator.</p>
+  <p>For Spark-heavy environments, OMD and DataHub are clearly ahead.
+  ODD’s model can represent the same edges; it just lacks the
+  off-the-shelf producer.</p>
+  <hr />
+  <h2 id="how-they-shape-data-quality">How they shape data quality</h2>
+  <p><strong>OpenMetadata</strong> has the most opinionated DQ surface.
+  About 25 built-in test types are baked into the platform, results land
+  as time-series, failures auto-create Incidents with a resolve
+  workflow, and the embedded Airflow runs scheduled test suites. The UI
+  surfaces it as a “Data Quality” tab on every table page with DQ status
+  badges that overlay onto the lineage graph nodes. Tests live in the
+  catalog (UI-editable) or in YAML (<code>metadata test</code>).</p>
+  <p><strong>DataHub</strong> treats Assertions as first-class entities.
+  The schema accommodates native DataHub assertions, Great Expectations
+  runs, and Soda runs through one common shape. The platform’s role is
+  the catalog and the alerting surface; running the assertions is
+  delegated to the producer. A native assertion is operationally similar
+  to a Great Expectations check — both end up posted as
+  <code>assertionInfo</code> + <code>assertionRunEvent</code> aspects
+  via the same API.</p>
+  <p><strong>ODD</strong> has the thinnest DQ story. There’s no
+  <code>DATA_QUALITY_TEST</code> entity type. Tests come in as Great
+  Expectations integration results, which post <code>JOB_RUN</code>
+  entities with <code>data_quality_test_run</code> payloads. The
+  platform renders them but doesn’t author them. For teams whose DQ
+  already lives in Great Expectations or dbt tests, ODD is fine. For
+  teams expecting to define checks inside the catalog UI, it’s a real
+  gap.</p>
+  <hr />
+  <h2 id="how-they-shape-governance">How they shape governance</h2>
+  <p><strong>OpenMetadata</strong>: owners, tiers, domains, data
+  products, and a hierarchical glossary, all attached to entities as
+  cross-cutting concerns. The “Data Insights” view aggregates these into
+  governance KPIs (ownership coverage, tier coverage, description
+  coverage, DQ pass-rate over time) and renders a dashboard out of the
+  box. The numbers stay at zero until curation happens — which is the
+  design.</p>
+  <p><strong>DataHub</strong>: a richer governance model with multiple
+  owner types (DATAOWNER, TECHNICAL_OWNER, BUSINESS_OWNER, STEWARD),
+  domains, data products, glossary terms, and BusinessAttributes. Tiers
+  are conventionally encoded as tags (<code>urn:li:tag:Tier1</code>).
+  The governance KPIs surface through a “Analytics” / “Stewardship”
+  view, and via the GraphQL API for custom dashboards.</p>
+  <p><strong>ODD</strong>: owners and tags exist; tiers and domains
+  don’t have first-class equivalents (tiering is a tag-naming
+  convention). The governance scoreboard is thinner. Terms exist for
+  business vocabulary, similar to OMD’s glossary.</p>
+  <hr />
+  <h2 id="how-they-shape-evolution">How they shape evolution</h2>
+  <p>Schema evolution under the three models tells you a lot about the
+  architecture:</p>
+  <p><strong>OpenMetadata</strong> ships breaking changes by versioning
+  entities in-place. A new asset type means a new entity class, with
+  full UI support added in the same release. Backwards compatibility on
+  the API is reasonable but not absolute; major version upgrades
+  sometimes require connector reconfiguration.</p>
+  <p><strong>DataHub</strong> evolves additively. Adding a new aspect to
+  an existing entity doesn’t break existing producers — they just
+  continue to write the aspects they know about. New entity types ship
+  as new URN schemas. The Pegasus schema language is the lingua franca;
+  adding fields is a non-breaking change by default.</p>
+  <p><strong>ODD</strong> evolves via the spec. Schema versions are
+  published openly and producers / consumers update at their own pace.
+  The spec is small enough that breaking changes are rare; when they
+  happen, the migration is mechanical.</p>
+  <hr />
+  <h2 id="what-this-poc-actually-showed">What this POC actually
+  showed</h2>
+  <p>The three were stood up locally side-by-side with the same source
+  data (a small Scala/Spark project producing parquet files through two
+  jobs). The catalog content ended up looking like this:</p>
+  <table>
+  <colgroup>
+  <col style="width: 25%" />
+  <col style="width: 25%" />
+  <col style="width: 25%" />
+  <col style="width: 25%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th></th>
+  <th>OMD</th>
+  <th>DataHub</th>
+  <th>ODD</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>Data assets in the catalog</td>
+  <td>4 tables</td>
+  <td>4 datasets</td>
+  <td>4 data entities</td>
+  </tr>
+  <tr>
+  <td>Pipelines as visible entities</td>
+  <td>2 Pipelines under <code>spark-poc</code> Pipeline Service</td>
+  <td>2 DataJobs under a <code>spark-poc</code> DataFlow</td>
+  <td>None (no <code>JOB</code> type in the enum)</td>
+  </tr>
+  <tr>
+  <td>Lineage edges</td>
+  <td>3 table-to-table, with column lineage on simple aggregations</td>
+  <td>2 dataset-to-dataset, with column lineage</td>
+  <td>3 table-to-table (table-level only; column lineage not
+  rendered)</td>
+  </tr>
+  <tr>
+  <td>DQ tests visible</td>
+  <td>2 (one green, one red, with an Incident on failure)</td>
+  <td>2 Assertions (one SUCCESS, one FAILURE assertionRunEvents)</td>
+  <td>Not authored as first-class entities</td>
+  </tr>
+  <tr>
+  <td>Owners / tiers / descriptions</td>
+  <td>All populated</td>
+  <td>All populated (4 tiers, ownership, domain, profiles)</td>
+  <td>Datasets and lineage; owners/tags need separate management API
+  calls</td>
+  </tr>
+  <tr>
+  <td>Operational complexity to land all of the above</td>
+  <td>Moderate — fixed the agent’s locationPath lookup with a manual
+  lineage post and the DB migration init order</td>
+  <td>Moderate — fixed token signing keys, the aspect.value-as-string
+  serialisation, and a Restli em-dash rejection</td>
+  <td>Lowest — fixed the data source registration ordering and worked
+  within the closed type enum</td>
+  </tr>
+  <tr>
+  <td>Containers up at the end</td>
+  <td>4</td>
+  <td>7</td>
+  <td>2</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>The ODD result isn’t poorer wiring; it’s the model. ODD doesn’t
+  model authored pipelines or authored DQ tests as catalog assets.
+  That’s the architectural bet.</p>
+  <hr />
+  <h2 id="picking-between-them">Picking between them</h2>
+  <p><strong>If the platform is Java/Spark, self-hosting is acceptable,
+  and one team will own the catalog as a product</strong>: OpenMetadata.
+  The agent is the strongest in this lane, the UI is polished, the DQ
+  surface is the most opinionated, the embedded Airflow makes setup
+  cohesive.</p>
+  <p><strong>If many independent producers will write metadata to the
+  same catalog, event-driven semantics matter, and operating Kafka is
+  fine</strong>: DataHub. Aspects + Kafka are exactly the right shape;
+  the operational weight is the price.</p>
+  <p><strong>If interop with a metadata standard is the priority, or the
+  ops budget is small and the catalog UX is secondary</strong>: Open
+  Data Discovery. The spec is the product; the platform is the easy
+  reference consumer.</p>
+  <p><strong>If self-hosting is the binding constraint and budget
+  exists</strong>: commercial — Atlan, Collibra, Alation. Polished UX,
+  hosted, much higher cost, curation labour often subsidised by the
+  vendor’s own data engineers.</p>
+  <p>The choice usually hinges on three questions:</p>
+  <ol type="1">
+  <li><strong>How many independent metadata producers will write to this
+  catalog?</strong> Many → DataHub. Few → OMD or ODD.</li>
+  <li><strong>How important is the in-catalog DQ authoring
+  story?</strong> Very → OMD. Externally-owned DQ → DataHub or ODD.</li>
+  <li><strong>How much ops appetite is there?</strong> A lot → DataHub.
+  A little → ODD. Middle → OMD.</li>
+  </ol>
+  <p>The one constant across all three: <strong>the catalog only stays
+  useful if curation is part of someone’s routine.</strong> The
+  technical install is the easy part. Owners, descriptions, tiers, tests
+  don’t keep themselves current. Whichever tool gets picked, the
+  operational story for the platform team is the same — and it’s the
+  long pole, not the deployment.</p>
+  </main>
+</div>
+
+<footer class="foot">openmetadata · poc notes</footer>
+
+<script>
+// Smooth-scroll active TOC link
+document.addEventListener('DOMContentLoaded', () => {
+  const tocLinks = document.querySelectorAll('nav#TOC a[href^="#"]');
+  if (!tocLinks.length) return;
+  const targets = Array.from(tocLinks).map(a => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+  const linkFor = new Map();
+  tocLinks.forEach(a => linkFor.set(a.getAttribute('href').slice(1), a));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const id = e.target.id;
+      const link = linkFor.get(id);
+      if (!link) return;
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  targets.forEach(t => obs.observe(t));
+});
+</script>
+</body>
+</html>

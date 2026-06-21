@@ -1,0 +1,34 @@
+# Build artifacts
+target/
+build/
+.gradle/
+
+# IDE / editor
+.bsp/
+.bloop/
+.metals/
+.idea/
+.vscode/
+*.iml
+
+# macOS
+.DS_Store
+
+# Local docker / runtime data
+docker-volume/
+
+# Beads runtime state
+.beads/embeddeddolt/
+.beads/backup/
+.beads/interactions.jsonl
+.beads/export-state.json
+.beads/last-touched
+
+# Local-only
+lib/*.jar
+.env
+sample-data/_local/
+.notes/
+
+# Generated HTML (kept alongside .md sources)
+# Uncomment to ignore: docs/*.html
