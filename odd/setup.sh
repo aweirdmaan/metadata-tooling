@@ -19,6 +19,18 @@ require curl
 require python3
 
 # ---------------------------------------------------------------------------
+# .env (gitignored; create on first run)
+
+if [[ ! -f .env ]]; then
+  cat > .env <<ENVEOF
+POSTGRES_USER=odd
+POSTGRES_PASSWORD=oddpass
+POSTGRES_DATABASE=odd_platform
+ENVEOF
+  echo "Created .env (gitignored) with default Postgres credentials."
+fi
+
+# ---------------------------------------------------------------------------
 # Stack
 
 echo "[1/4] Bringing up ODD Platform (postgres + odd-platform on :8090)..."
@@ -32,8 +44,8 @@ echo "      platform ready → http://localhost:8090  (no auth)"
 
 echo "[2/4] Registering 'local-files' DataSource..."
 
-# Idempotent: if it already exists, fetch its token
-EXISTING=$(curl -fsS "http://localhost:8090/api/datasources" 2>/dev/null \
+# Idempotent: if it already exists, fetch its token (paginated endpoint)
+EXISTING=$(curl -fsS "http://localhost:8090/api/datasources?page=1&size=100" 2>/dev/null \
   | python3 -c "import sys,json; d=json.load(sys.stdin); m=[x for x in d.get('items',[]) if x.get('oddrn')=='//file/host/local']; print(m[0].get('token',{}).get('value','') if m else '')")
 
 if [[ -z "$EXISTING" ]]; then
