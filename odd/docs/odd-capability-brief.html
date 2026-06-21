@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Open Data Discovery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:           #fafaf7;
+  --surface:      #ffffff;
+  --ink:          #1f2937;
+  --ink-heading:  #0f172a;
+  --muted:        #64748b;
+  --accent:       #0e7490;
+  --accent-soft:  #ecfeff;
+  --accent-hover: #0891b2;
+  --border:       #e5e7eb;
+  --rule:         #d1d5db;
+  --code-bg:      #f1f5f9;
+  --code-ink:     #334155;
+  --pre-bg:       #0f172a;
+  --pre-ink:      #e2e8f0;
+  --shadow:       0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  font-size:16px;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Layout */
+.layout{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  max-width:1440px;
+  margin:0 auto;
+  gap:3rem;
+  padding:0 2rem;
+}
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr;gap:0}
+  nav#TOC{position:static !important;max-height:none !important;border-right:none;border-bottom:1px solid var(--border);padding:1rem 0 1.5rem !important}
+}
+
+/* Header band */
+header.brand{
+  background:linear-gradient(135deg, #0f172a 0%, #0e7490 100%);
+  color:#fff;
+  padding:2.4rem 2rem 2rem;
+  margin-bottom:3rem;
+}
+header.brand .inner{
+  max-width:1440px;
+  margin:0 auto;
+  padding:0 0rem;
+}
+header.brand .eyebrow{
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  opacity:.75;
+  margin-bottom:.4rem;
+  font-weight:500;
+}
+header.brand h1.brand-title{
+  font-size:2.4rem;
+  font-weight:700;
+  letter-spacing:-0.02em;
+  margin:0 0 .3rem;
+  border:none;
+  color:#fff;
+}
+header.brand .tagline{
+  color:#cffafe;
+  font-family:'Lora', serif;
+  font-style:italic;
+  font-size:1.05rem;
+  margin:0;
+  opacity:.95;
+}
+
+/* TOC sidebar */
+nav#TOC{
+  position:sticky;
+  top:1.5rem;
+  align-self:start;
+  padding:1.5rem 0;
+  max-height:calc(100vh - 3rem);
+  overflow-y:auto;
+  font-size:.88rem;
+  border-right:1px solid var(--border);
+  padding-right:1.4rem;
+}
+nav#TOC::-webkit-scrollbar{width:6px}
+nav#TOC::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+nav#TOC ul{
+  list-style:none;
+  padding-left:0;
+  margin:0;
+}
+nav#TOC > ul > li{margin-bottom:.3rem}
+nav#TOC ul ul{padding-left:1rem;margin-top:.2rem}
+nav#TOC a{
+  color:var(--muted);
+  text-decoration:none;
+  display:block;
+  padding:.25rem .6rem;
+  border-radius:5px;
+  border-left:2px solid transparent;
+  transition:all .15s ease;
+  font-weight:500;
+}
+nav#TOC a:hover{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+}
+nav#TOC a.active{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+  font-weight:600;
+}
+
+/* Main content */
+main{
+  max-width:920px;
+  padding:.5rem 0 4rem;
+}
+main h1:first-child{display:none}
+
+/* Typography */
+h1,h2,h3,h4{
+  color:var(--ink-heading);
+  letter-spacing:-0.015em;
+  scroll-margin-top:1.5rem;
+}
+h1{font-size:2.1rem;font-weight:700;margin:0 0 1.4rem;padding-bottom:.5rem;border-bottom:3px solid var(--accent)}
+h2{font-size:1.5rem;font-weight:600;margin:2.6rem 0 .8rem;padding-bottom:.35rem;border-bottom:1px solid var(--rule)}
+h3{font-size:1.15rem;font-weight:600;color:var(--accent);margin:1.8rem 0 .6rem}
+
+p{margin:.9rem 0}
+strong{color:var(--ink-heading);font-weight:600}
+
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+a:hover{border-bottom-color:var(--accent)}
+
+/* Inline + block code */
+code{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--code-bg);
+  color:var(--code-ink);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:.85em;
+  font-weight:500;
+  border:1px solid #e2e8f0;
+}
+pre{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--pre-bg);
+  color:var(--pre-ink);
+  padding:1.1rem 1.3rem;
+  border-radius:8px;
+  overflow-x:auto;
+  font-size:.84em;
+  line-height:1.6;
+  margin:1.2rem 0;
+  box-shadow:var(--shadow);
+}
+pre code{background:none;color:inherit;padding:0;border:none;font-size:1em;font-weight:400}
+
+/* Lists */
+ul,ol{padding-left:1.6rem;margin:.7rem 0 1rem}
+li{margin:.3rem 0}
+li::marker{color:var(--accent)}
+
+/* Blockquote */
+blockquote{
+  border-left:3px solid var(--accent);
+  background:var(--accent-soft);
+  margin:1.2rem 0;
+  padding:.7rem 1.2rem;
+  border-radius:0 6px 6px 0;
+  color:var(--ink);
+}
+blockquote p:first-child{margin-top:0}
+blockquote p:last-child{margin-bottom:0}
+
+/* Tables */
+table{
+  border-collapse:separate;
+  border-spacing:0;
+  margin:1.4rem 0;
+  font-size:.93em;
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+thead{background:#0f172a;color:#f8fafc}
+th{padding:.6rem .9rem;text-align:left;font-weight:600;font-size:.88em;letter-spacing:.01em}
+td{padding:.55rem .9rem;border-top:1px solid var(--border);vertical-align:top}
+tbody tr:nth-child(even){background:#f8fafc}
+
+hr{border:none;border-top:1px solid var(--rule);margin:2.4rem 0}
+
+/* Footer */
+footer.foot{
+  max-width:1440px;
+  margin:3rem auto 2rem;
+  padding:1.5rem 2rem;
+  color:var(--muted);
+  font-size:.85rem;
+  border-top:1px solid var(--border);
+  text-align:center;
+  font-family:'Lora',serif;
+  font-style:italic;
+}
+</style>
+</head>
+<body>
+
+<header class="brand">
+  <div class="inner">
+    <div class="eyebrow">Capability brief</div>
+    <h1 class="brand-title">Open Data Discovery</h1>
+    <p class="tagline">A spec-first, lightweight catalog with smaller
+surface and smaller ops.</p>
+  </div>
+</header>
+
+<div class="layout">
+    <ul>
+    <li><a href="#open-data-discovery-odd"
+    id="toc-open-data-discovery-odd">Open Data Discovery (ODD)</a>
+    <ul>
+    <li><a href="#what-it-is" id="toc-what-it-is">What it is</a></li>
+    <li><a href="#how-the-model-is-shaped"
+    id="toc-how-the-model-is-shaped">How the model is shaped</a></li>
+    <li><a href="#what-it-does" id="toc-what-it-does">What it
+    does</a></li>
+    <li><a href="#what-it-doesnt-do" id="toc-what-it-doesnt-do">What it
+    doesn’t do</a></li>
+    <li><a href="#what-surprised-in-this-poc"
+    id="toc-what-surprised-in-this-poc">What surprised in this
+    POC</a></li>
+    <li><a href="#where-it-fits" id="toc-where-it-fits">Where it
+    fits</a></li>
+    <li><a href="#running-it" id="toc-running-it">Running it</a></li>
+    </ul></li>
+    </ul>
+    <main>
+  <h1 id="open-data-discovery-odd">Open Data Discovery (ODD)</h1>
+  <p>A read on what ODD is, what it does, and where the model gets in
+  the way.</p>
+  <hr />
+  <h2 id="what-it-is">What it is</h2>
+  <p>A small, self-hosted metadata platform built around an open
+  specification. The actual product, in the strongest sense, is the
+  <strong>ODD Spec</strong> — a JSON Schema that defines how any tool
+  can describe its data entities so that any other tool can ingest them.
+  The <strong>ODD Platform</strong> is one reference implementation of a
+  consumer; it provides a catalog UI and an ingestion endpoint that
+  accepts ODD-shaped payloads.</p>
+  <p>The stack is deliberately lean: a Java Spring backend and a
+  Postgres database. Two containers. No Kafka, no graph store, no
+  Elasticsearch. Search is full-text inside Postgres. The whole platform
+  comes up in a few minutes on a developer laptop.</p>
+  <p>Producers — called <strong>collectors</strong> — run as separate
+  processes outside the platform. They scrape source systems (databases,
+  dashboards, ML platforms, message queues) and POST ODD-Spec payloads
+  to the platform’s ingestion API. There are ODD collectors for
+  Snowflake, Postgres, MySQL, Tableau, Kafka, Airflow, and a handful of
+  others; a Spark collector exists but its scope is narrower than what
+  OMD or DataHub offer.</p>
+  <h2 id="how-the-model-is-shaped">How the model is shaped</h2>
+  <p>Everything is a <strong>DataEntity</strong>. Each entity has a
+  globally unique <strong>OddRN</strong> (Open Data Discovery Resource
+  Name), a <code>type</code> from a fixed enum, and one or more typed
+  payload blocks that depend on the type. There are no aspects in the
+  DataHub sense — entities are monolithic — but the payload shape varies
+  by entity type.</p>
+  <p>The shape:</p>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Field</th>
+  <th>Meaning</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><code>oddrn</code></td>
+  <td>Path-style identifier —
+  e.g. <code>//snowflake/host/abc/databases/prod/schemas/public/tables/users</code></td>
+  </tr>
+  <tr>
+  <td><code>name</code></td>
+  <td>Display name</td>
+  </tr>
+  <tr>
+  <td><code>description</code></td>
+  <td>Markdown blurb</td>
+  </tr>
+  <tr>
+  <td><code>type</code></td>
+  <td>One of FILE, TABLE, VIEW, JOB_RUN, KAFKA_TOPIC, ML_MODEL,
+  DASHBOARD, MICROSERVICE, etc.</td>
+  </tr>
+  <tr>
+  <td><code>data_source_oddrn</code></td>
+  <td>Parent data source under which this entity lives</td>
+  </tr>
+  <tr>
+  <td><code>dataset</code></td>
+  <td>Optional block: <code>field_list</code> with column schema</td>
+  </tr>
+  <tr>
+  <td><code>data_transformer</code></td>
+  <td>Optional block: <code>inputs</code>, <code>outputs</code> —
+  describes a pipeline-shaped relationship</td>
+  </tr>
+  <tr>
+  <td><code>data_consumer</code></td>
+  <td>Optional block: <code>inputs</code> — describes a dashboard or
+  report that reads data</td>
+  </tr>
+  <tr>
+  <td><code>metadata</code></td>
+  <td>Optional schema-tagged extension blocks</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>Lineage is implicit — it falls out of the
+  <code>data_transformer.inputs</code> and
+  <code>data_consumer.inputs</code> blocks on existing entities. There’s
+  no separate <code>lineage</code> API; declaring an entity as a
+  transformer of two inputs is how the edge gets created.</p>
+  <h2 id="what-it-does">What it does</h2>
+  <h3 id="search-and-discovery">Search and discovery</h3>
+  <p>Full-text search backed by Postgres <code>tsvector</code> indexes.
+  The UI offers facets by data source, owner, tag, and type. Each entity
+  has a single page with description, schema (if a <code>dataset</code>
+  block exists), upstreams and downstreams (from transformer blocks),
+  owners, tags, and metadata extensions. Not as fast or flexible as
+  Elasticsearch-backed search, but enough for the platform’s scope.</p>
+  <p>A <strong>Terms</strong> dictionary works as ODD’s glossary
+  equivalent — searchable business vocabulary attached to entities or
+  columns.</p>
+  <h3 id="lineage">Lineage</h3>
+  <p>Table-level lineage everywhere; <strong>no column-level
+  lineage</strong> in the open-source platform’s default rendering.
+  Edges come from one place: the <code>data_transformer.inputs</code>
+  and <code>data_consumer.inputs</code> blocks on entities. The UI walks
+  the graph and shows the result.</p>
+  <p>The simplicity is the design. ODD doesn’t have a runtime agent
+  comparable to OMD’s Spark Agent or DataHub’s
+  <code>acryl-spark-lineage</code> — there’s an
+  <code>odd-collector</code> for Spark but its scope is narrower (job
+  catalog rather than fine-grained read/write capture). For Spark
+  lineage at the level OMD and DataHub offer, the pragmatic path is to
+  POST the lineage directly via the ingestion API from a wrapper
+  script.</p>
+  <h3 id="data-quality-limited">Data quality (limited)</h3>
+  <p>This is where ODD’s model is thinnest. The fixed DataEntity type
+  enum doesn’t include <code>DATA_QUALITY_TEST</code> as a first-class
+  type. Test results land under the <code>JOB_RUN</code> entity type
+  with a <code>data_quality_test_run</code> payload block — but this
+  requires the test entity itself (which the run references via
+  <code>data_quality_test_oddrn</code>) to exist as a separately-defined
+  entity, which the enum doesn’t directly support.</p>
+  <p>In practice, ODD’s DQ story works by ingesting from external
+  runners (Great Expectations is the documented integration) which
+  produce test definitions and runs in a shape ODD knows how to render.
+  The platform doesn’t author tests itself; it catalogues them.</p>
+  <h3 id="governance">Governance</h3>
+  <ul>
+  <li><strong>Owners</strong> managed via a separate
+  <code>/api/owners</code> API; attached to entities by ID through
+  entity-edit endpoints.</li>
+  <li><strong>Tags</strong> likewise — defined globally and applied to
+  entities.</li>
+  <li><strong>Terms</strong> — the glossary equivalent,
+  hierarchical.</li>
+  <li><strong>No tier system</strong> baked in like DataHub’s
+  <code>urn:li:tag:Tier1</code>; tiering, if needed, is a tag-naming
+  convention.</li>
+  <li><strong>No domains</strong> in the OMD / DataHub sense; ODD has a
+  flatter structure organized around data sources.</li>
+  </ul>
+  <h3 id="insights">Insights</h3>
+  <p>ODD’s “Activity” view and a small set of dashboards (entity counts,
+  owner coverage, data source health) are built into the UI. There’s no
+  built-in BI / chart builder; for richer analytics, point an external
+  tool at the Postgres database directly.</p>
+  <h3 id="collectors">Collectors</h3>
+  <p>About 30 source collectors maintained by the ODD community covering
+  common warehouses, file stores, dashboards, and streaming systems.
+  Each collector is a standalone process (typically Python, sometimes
+  Java) configured via YAML and run on a schedule with cron, Airflow, or
+  systemd. Collectors POST ODD-spec payloads to the platform’s
+  <code>/ingestion/entities</code> endpoint.</p>
+  <h3 id="auth-and-access">Auth and access</h3>
+  <p>The default ODD Platform has <strong>no authentication</strong> —
+  anyone reaching the port can read and write. Production setups front
+  it with an OIDC proxy or use the recently-added basic auth feature.
+  Collectors authenticate with tokens scoped to a specific data
+  source.</p>
+  <h2 id="what-it-doesnt-do">What it doesn’t do</h2>
+  <ul>
+  <li><strong>No first-class pipeline entity.</strong> The enum has
+  <code>JOB_RUN</code> but no <code>JOB</code> type. Pipelines are
+  inferred from <code>data_transformer.inputs</code> on the output
+  entities, not modelled as standalone navigable assets. The OMD /
+  DataHub experience of clicking into a pipeline and seeing its history
+  doesn’t translate directly.</li>
+  <li><strong>No first-class DQ test entity.</strong> Tests come in via
+  the GX integration or via JOB_RUN entities with a
+  <code>data_quality_test_run</code> block, but the platform doesn’t
+  natively author them.</li>
+  <li><strong>No column-level lineage</strong> in the default UI
+  rendering.</li>
+  <li><strong>No event-bus / streaming changes</strong> like DataHub.
+  Changes are HTTP-pushed by collectors on a schedule.</li>
+  <li><strong>No webhook / alerting layer</strong> baked in.
+  Integrations exist (some collectors emit Slack notifications) but the
+  platform itself doesn’t notify on changes.</li>
+  <li><strong>Smaller connector library</strong> than OMD (~80) or
+  DataHub (~80+). ODD covers the common cases but the long tail is
+  thinner.</li>
+  </ul>
+  <h2 id="what-surprised-in-this-poc">What surprised in this POC</h2>
+  <ul>
+  <li><strong>The ingestion endpoint requires a DataSource to exist
+  first</strong>, with the exact OddRN referenced by the entities.
+  Posting entities under <code>//file/host/local</code> returns 404
+  “DataSource not found” until that source is registered via
+  <code>POST /api/datasources</code>.</li>
+  <li><strong>The data source registration returns its own
+  token</strong> that’s different from the collector token created via
+  Management → Collectors. The data source token is the one that
+  authorises entity pushes under that source.</li>
+  <li><strong>DataEntityType is a closed enum.</strong> Inventing types
+  like <code>DATA_QUALITY_TEST_RUN</code> returns a 500 with
+  <code>Cannot construct instance of DataEntityType, problem: Unexpected value</code>.
+  The valid types are: API_CALL, API_SERVICE, DASHBOARD,
+  DATABASE_SERVICE, ENTITY_RELATIONSHIP, FEATURE_GROUP, FILE,
+  GRAPH_NODE, GRAPH_RELATIONSHIP, JOB_RUN, KAFKA_SERVICE, KAFKA_TOPIC,
+  MICROSERVICE, ML_EXPERIMENT, ML_MODEL, ML_MODEL_TRAINING, TABLE,
+  UNKNOWN, VECTOR_STORE, VIEW.</li>
+  <li><strong>JOB_RUN entities need a parent transformer that
+  exists.</strong> Posting a JOB_RUN whose
+  <code>transformer_oddrn</code> doesn’t resolve fails with a Postgres
+  foreign-key violation. This is one of the places the model assumes a
+  pre-existing job system (Airflow, etc.) the platform is just
+  observing.</li>
+  <li><strong>The official <code>demo.yaml</code> is bigger than
+  needed.</strong> It includes injector and sample-postgres services
+  that require external <code>../injector</code> mounts. A minimal
+  compose with just <code>database</code> + <code>odd-platform</code> is
+  enough to run the platform.</li>
+  <li><strong>Port 8080 conflicts</strong> with DataHub’s GMS when
+  running multiple catalogs side by side. Remap to 8090 (or any other)
+  in the compose <code>ports</code> block.</li>
+  </ul>
+  <h2 id="where-it-fits">Where it fits</h2>
+  <p>ODD makes a different bet than OMD or DataHub. The product is the
+  <strong>spec</strong>, not the platform. That changes who it’s
+  for:</p>
+  <ul>
+  <li>A small organisation that wants a catalog + lineage without
+  operating Kafka, MySQL, Neo4j, and a handful of JVM services — ODD’s
+  two-container stack is the lightest credible option.</li>
+  <li>A platform team building infrastructure that needs to interop with
+  a metadata standard — adopting the ODD Spec gives you a stable
+  interchange format and a reference consumer for free.</li>
+  <li>An environment where the catalog UX is secondary and the priority
+  is feeding metadata cleanly between systems — ODD’s spec-first design
+  favours that.</li>
+  </ul>
+  <p>It’s a less polished fit than OMD or DataHub when the UI is the
+  primary deliverable, when DQ needs to be authored inside the catalog,
+  or when many independent producers need write decoupling.</p>
+  <h2 id="running-it">Running it</h2>
+  <p>The POC at <code>pocs/odd</code>:</p>
+  <ul>
+  <li><code>docker compose up -d</code> brings up Postgres on 5532 and
+  the ODD Platform UI on 8090.</li>
+  <li>In the UI, create a Collector under <strong>Management →
+  Collectors</strong>, copy its token. Then
+  <code>POST /api/datasources</code> to register a DataSource — the
+  response returns a separate token specific to that source.</li>
+  <li><code>scripts/seed-odd.sh</code> (with
+  <code>ODD_TOKEN=&lt;data-source-token&gt;</code>) posts the four data
+  entities (sensor_readings, zone_lookup, sensor_profiles,
+  sensor_profiles_enriched) including the <code>data_transformer.inputs</code>
+  blocks that create the lineage edges.</li>
+  <li><code>scripts/populate-metadata.sh</code> attempts to add JOB_RUN
+  entities for pipelines and DQ test runs — partially limited by ODD’s
+  data model.</li>
+  </ul>
+  <p>End state: 4 data entities visible in the Catalog tab with lineage
+  between them. Pipeline and DQ surfaces are thinner than OMD or DataHub
+  — a real product characteristic, not a wiring gap.</p>
+  </main>
+</div>
+
+<footer class="foot">openmetadata · poc notes</footer>
+
+<script>
+// Smooth-scroll active TOC link
+document.addEventListener('DOMContentLoaded', () => {
+  const tocLinks = document.querySelectorAll('nav#TOC a[href^="#"]');
+  if (!tocLinks.length) return;
+  const targets = Array.from(tocLinks).map(a => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+  const linkFor = new Map();
+  tocLinks.forEach(a => linkFor.set(a.getAttribute('href').slice(1), a));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const id = e.target.id;
+      const link = linkFor.get(id);
+      if (!link) return;
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  targets.forEach(t => obs.observe(t));
+});
+</script>
+</body>
+</html>

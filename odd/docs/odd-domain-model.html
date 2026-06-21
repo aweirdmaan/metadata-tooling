@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ODD Domain Model</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,500;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:           #fafaf7;
+  --surface:      #ffffff;
+  --ink:          #1f2937;
+  --ink-heading:  #0f172a;
+  --muted:        #64748b;
+  --accent:       #0e7490;
+  --accent-soft:  #ecfeff;
+  --accent-hover: #0891b2;
+  --border:       #e5e7eb;
+  --rule:         #d1d5db;
+  --code-bg:      #f1f5f9;
+  --code-ink:     #334155;
+  --pre-bg:       #0f172a;
+  --pre-ink:      #e2e8f0;
+  --shadow:       0 1px 2px rgba(15,23,42,.04), 0 8px 24px rgba(15,23,42,.05);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  font-size:16px;
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* Layout */
+.layout{
+  display:grid;
+  grid-template-columns: 260px 1fr;
+  max-width:1440px;
+  margin:0 auto;
+  gap:3rem;
+  padding:0 2rem;
+}
+@media (max-width: 900px){
+  .layout{grid-template-columns:1fr;gap:0}
+  nav#TOC{position:static !important;max-height:none !important;border-right:none;border-bottom:1px solid var(--border);padding:1rem 0 1.5rem !important}
+}
+
+/* Header band */
+header.brand{
+  background:linear-gradient(135deg, #0f172a 0%, #0e7490 100%);
+  color:#fff;
+  padding:2.4rem 2rem 2rem;
+  margin-bottom:3rem;
+}
+header.brand .inner{
+  max-width:1440px;
+  margin:0 auto;
+  padding:0 0rem;
+}
+header.brand .eyebrow{
+  font-size:.78rem;
+  text-transform:uppercase;
+  letter-spacing:.18em;
+  opacity:.75;
+  margin-bottom:.4rem;
+  font-weight:500;
+}
+header.brand h1.brand-title{
+  font-size:2.4rem;
+  font-weight:700;
+  letter-spacing:-0.02em;
+  margin:0 0 .3rem;
+  border:none;
+  color:#fff;
+}
+header.brand .tagline{
+  color:#cffafe;
+  font-family:'Lora', serif;
+  font-style:italic;
+  font-size:1.05rem;
+  margin:0;
+  opacity:.95;
+}
+
+/* TOC sidebar */
+nav#TOC{
+  position:sticky;
+  top:1.5rem;
+  align-self:start;
+  padding:1.5rem 0;
+  max-height:calc(100vh - 3rem);
+  overflow-y:auto;
+  font-size:.88rem;
+  border-right:1px solid var(--border);
+  padding-right:1.4rem;
+}
+nav#TOC::-webkit-scrollbar{width:6px}
+nav#TOC::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:3px}
+nav#TOC ul{
+  list-style:none;
+  padding-left:0;
+  margin:0;
+}
+nav#TOC > ul > li{margin-bottom:.3rem}
+nav#TOC ul ul{padding-left:1rem;margin-top:.2rem}
+nav#TOC a{
+  color:var(--muted);
+  text-decoration:none;
+  display:block;
+  padding:.25rem .6rem;
+  border-radius:5px;
+  border-left:2px solid transparent;
+  transition:all .15s ease;
+  font-weight:500;
+}
+nav#TOC a:hover{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+}
+nav#TOC a.active{
+  color:var(--accent);
+  background:var(--accent-soft);
+  border-left-color:var(--accent);
+  font-weight:600;
+}
+
+/* Main content */
+main{
+  max-width:920px;
+  padding:.5rem 0 4rem;
+}
+main h1:first-child{display:none}
+
+/* Typography */
+h1,h2,h3,h4{
+  color:var(--ink-heading);
+  letter-spacing:-0.015em;
+  scroll-margin-top:1.5rem;
+}
+h1{font-size:2.1rem;font-weight:700;margin:0 0 1.4rem;padding-bottom:.5rem;border-bottom:3px solid var(--accent)}
+h2{font-size:1.5rem;font-weight:600;margin:2.6rem 0 .8rem;padding-bottom:.35rem;border-bottom:1px solid var(--rule)}
+h3{font-size:1.15rem;font-weight:600;color:var(--accent);margin:1.8rem 0 .6rem}
+
+p{margin:.9rem 0}
+strong{color:var(--ink-heading);font-weight:600}
+
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid transparent;transition:border-color .15s}
+a:hover{border-bottom-color:var(--accent)}
+
+/* Inline + block code */
+code{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--code-bg);
+  color:var(--code-ink);
+  padding:1px 6px;
+  border-radius:4px;
+  font-size:.85em;
+  font-weight:500;
+  border:1px solid #e2e8f0;
+}
+pre{
+  font-family:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace;
+  background:var(--pre-bg);
+  color:var(--pre-ink);
+  padding:1.1rem 1.3rem;
+  border-radius:8px;
+  overflow-x:auto;
+  font-size:.84em;
+  line-height:1.6;
+  margin:1.2rem 0;
+  box-shadow:var(--shadow);
+}
+pre code{background:none;color:inherit;padding:0;border:none;font-size:1em;font-weight:400}
+
+/* Lists */
+ul,ol{padding-left:1.6rem;margin:.7rem 0 1rem}
+li{margin:.3rem 0}
+li::marker{color:var(--accent)}
+
+/* Blockquote */
+blockquote{
+  border-left:3px solid var(--accent);
+  background:var(--accent-soft);
+  margin:1.2rem 0;
+  padding:.7rem 1.2rem;
+  border-radius:0 6px 6px 0;
+  color:var(--ink);
+}
+blockquote p:first-child{margin-top:0}
+blockquote p:last-child{margin-bottom:0}
+
+/* Tables */
+table{
+  border-collapse:separate;
+  border-spacing:0;
+  margin:1.4rem 0;
+  font-size:.93em;
+  width:100%;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:8px;
+  overflow:hidden;
+  box-shadow:var(--shadow);
+}
+thead{background:#0f172a;color:#f8fafc}
+th{padding:.6rem .9rem;text-align:left;font-weight:600;font-size:.88em;letter-spacing:.01em}
+td{padding:.55rem .9rem;border-top:1px solid var(--border);vertical-align:top}
+tbody tr:nth-child(even){background:#f8fafc}
+
+hr{border:none;border-top:1px solid var(--rule);margin:2.4rem 0}
+
+/* Footer */
+footer.foot{
+  max-width:1440px;
+  margin:3rem auto 2rem;
+  padding:1.5rem 2rem;
+  color:var(--muted);
+  font-size:.85rem;
+  border-top:1px solid var(--border);
+  text-align:center;
+  font-family:'Lora',serif;
+  font-style:italic;
+}
+</style>
+</head>
+<body>
+
+<header class="brand">
+  <div class="inner">
+    <div class="eyebrow">Architecture</div>
+    <h1 class="brand-title">ODD: the domain model</h1>
+    <p class="tagline">DataEntities, OddRNs, and what the closed type
+enum implies.</p>
+  </div>
+</header>
+
+<div class="layout">
+    <ul>
+    <li><a href="#open-data-discovery-the-domain-model"
+    id="toc-open-data-discovery-the-domain-model">Open Data Discovery —
+    the domain model</a>
+    <ul>
+    <li><a href="#the-core-idea" id="toc-the-core-idea">The core
+    idea</a></li>
+    <li><a href="#the-oddrn" id="toc-the-oddrn">The OddRN</a></li>
+    <li><a href="#dataentitytype-a-closed-enum"
+    id="toc-dataentitytype-a-closed-enum">DataEntityType — a closed
+    enum</a></li>
+    <li><a href="#the-dataentity-envelope"
+    id="toc-the-dataentity-envelope">The DataEntity envelope</a></li>
+    <li><a href="#persistence" id="toc-persistence">Persistence</a></li>
+    <li><a href="#the-ingestion-api" id="toc-the-ingestion-api">The
+    ingestion API</a></li>
+    <li><a href="#what-the-model-omits"
+    id="toc-what-the-model-omits">What the model omits</a></li>
+    <li><a href="#mental-shortcut" id="toc-mental-shortcut">Mental
+    shortcut</a></li>
+    <li><a href="#why-this-shape" id="toc-why-this-shape">Why this
+    shape</a></li>
+    </ul></li>
+    </ul>
+    <main>
+  <h1 id="open-data-discovery-the-domain-model">Open Data Discovery —
+  the domain model</h1>
+  <p>Smaller surface than OMD or DataHub, by design.</p>
+  <h2 id="the-core-idea">The core idea</h2>
+  <p>ODD’s product is the <strong>specification</strong> more than the
+  platform. The spec defines a fixed shape for metadata: every asset
+  becomes a <strong>DataEntity</strong> with a globally unique
+  <strong>OddRN</strong>, a <code>type</code> from a closed enum, and
+  one or more typed payload blocks depending on type. Any producer that
+  emits this shape can be ingested by any consumer that accepts it. The
+  ODD Platform is one such consumer.</p>
+  <p>The entire model fits in one paragraph: a DataEntity belongs to a
+  DataSource, references its fields in a <code>dataset</code> block (if
+  it has a schema), and declares relationships to other entities via
+  <code>data_transformer</code> (it transforms these inputs into
+  outputs) or <code>data_consumer</code> (it consumes these inputs to
+  produce a report or dashboard). Lineage falls out of those
+  relationship blocks. Owners, tags, and terms are separate entities
+  that get linked back via the management API. That’s the whole
+  graph.</p>
+  <h2 id="the-oddrn">The OddRN</h2>
+  <p>A path-style identifier:</p>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Example</th>
+  <th>Meaning</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><code>//snowflake/host/abc.snowflakecomputing.com/databases/prod/schemas/public/tables/users</code></td>
+  <td>A Snowflake table</td>
+  </tr>
+  <tr>
+  <td><code>//airflow/host/airflow.internal/dags/etl_users</code></td>
+  <td>An Airflow DAG</td>
+  </tr>
+  <tr>
+  <td><code>//file/host/local/path/tmp/sensor_readings.parquet</code></td>
+  <td>A local parquet file</td>
+  </tr>
+  <tr>
+  <td><code>//kafka/host/broker.example.com/topics/events</code></td>
+  <td>A Kafka topic</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>The OddRN is the identity — entities don’t get a UUID, the OddRN is
+  the primary key. Producers construct OddRNs deterministically from the
+  source system’s own identifiers, which means two collectors hitting
+  the same source produce identical OddRNs and the platform naturally
+  de-duplicates.</p>
+  <h2 id="dataentitytype-a-closed-enum">DataEntityType — a closed
+  enum</h2>
+  <p>The full list of valid types:</p>
+  <table>
+  <thead>
+  <tr>
+  <th>Category</th>
+  <th>Types</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>Tabular data</td>
+  <td>TABLE, VIEW, FILE, FEATURE_GROUP, VECTOR_STORE</td>
+  </tr>
+  <tr>
+  <td>Pipelines / jobs</td>
+  <td>JOB_RUN</td>
+  </tr>
+  <tr>
+  <td>Streaming</td>
+  <td>KAFKA_TOPIC, KAFKA_SERVICE</td>
+  </tr>
+  <tr>
+  <td>Services</td>
+  <td>API_CALL, API_SERVICE, MICROSERVICE, DATABASE_SERVICE</td>
+  </tr>
+  <tr>
+  <td>Dashboards</td>
+  <td>DASHBOARD</td>
+  </tr>
+  <tr>
+  <td>ML</td>
+  <td>ML_MODEL, ML_MODEL_TRAINING, ML_EXPERIMENT</td>
+  </tr>
+  <tr>
+  <td>Graph</td>
+  <td>GRAPH_NODE, GRAPH_RELATIONSHIP, ENTITY_RELATIONSHIP</td>
+  </tr>
+  <tr>
+  <td>Other</td>
+  <td>UNKNOWN</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>Two things to note:</p>
+  <ol type="1">
+  <li><strong>There is no <code>JOB</code> type, only
+  <code>JOB_RUN</code>.</strong> A pipeline isn’t modelled as a
+  navigable entity — only its individual runs are. The expectation is
+  that the orchestrator (Airflow, dbt, etc.) is the source of truth for
+  pipeline structure; ODD only catches the runs.</li>
+  <li><strong>There is no <code>DATA_QUALITY_TEST</code> type.</strong>
+  Test results land as JOB_RUN entities with a
+  <code>data_quality_test_run</code> payload, but the test definition
+  itself doesn’t get a dedicated entity type. The expectation is that
+  the test framework (Great Expectations is the primary integration)
+  owns the test catalog; ODD shows the results.</li>
+  </ol>
+  <h2 id="the-dataentity-envelope">The DataEntity envelope</h2>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Field</th>
+  <th>Meaning</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><code>oddrn</code></td>
+  <td>Globally unique identifier</td>
+  </tr>
+  <tr>
+  <td><code>name</code></td>
+  <td>Display name</td>
+  </tr>
+  <tr>
+  <td><code>description</code></td>
+  <td>Markdown</td>
+  </tr>
+  <tr>
+  <td><code>type</code></td>
+  <td>One of the enum above</td>
+  </tr>
+  <tr>
+  <td><code>data_source_oddrn</code></td>
+  <td>Parent data source under which this entity lives</td>
+  </tr>
+  <tr>
+  <td><code>owner</code></td>
+  <td>Optional owner OddRN</td>
+  </tr>
+  <tr>
+  <td><code>tags</code></td>
+  <td>Optional list</td>
+  </tr>
+  <tr>
+  <td><code>metadata</code></td>
+  <td>Optional list of <code>{schema_url, metadata}</code> extension
+  blocks</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>Then one or more typed payload blocks depending on type:</p>
+  <table>
+  <colgroup>
+  <col style="width: 33%" />
+  <col style="width: 33%" />
+  <col style="width: 33%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Block</th>
+  <th>Used by</th>
+  <th>Carries</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><code>dataset</code></td>
+  <td>TABLE, VIEW, FILE</td>
+  <td><code>field_list</code> (column schemas),
+  <code>parent_oddrn</code>, <code>rows_number</code>, statistics</td>
+  </tr>
+  <tr>
+  <td><code>data_transformer</code></td>
+  <td>Output entities (TABLE / FILE produced by a job)</td>
+  <td><code>inputs[]</code>, <code>outputs[]</code>,
+  <code>source_code_url</code></td>
+  </tr>
+  <tr>
+  <td><code>data_transformer_run</code></td>
+  <td>JOB_RUN</td>
+  <td><code>transformer_oddrn</code>, <code>start_time</code>,
+  <code>end_time</code>, <code>status</code>,
+  <code>status_reason</code></td>
+  </tr>
+  <tr>
+  <td><code>data_quality_test_run</code></td>
+  <td>JOB_RUN</td>
+  <td><code>data_quality_test_oddrn</code>, <code>start_time</code>,
+  <code>end_time</code>, <code>status</code>,
+  <code>status_reason</code></td>
+  </tr>
+  <tr>
+  <td><code>data_consumer</code></td>
+  <td>DASHBOARD, ML_MODEL</td>
+  <td><code>inputs[]</code></td>
+  </tr>
+  <tr>
+  <td><code>data_input</code></td>
+  <td>Source raw inputs</td>
+  <td><code>outputs[]</code></td>
+  </tr>
+  <tr>
+  <td><code>ml_model</code></td>
+  <td>ML_MODEL</td>
+  <td><code>model_family</code>, <code>training_jobs</code>,
+  <code>target_field</code></td>
+  </tr>
+  </tbody>
+  </table>
+  <p>Lineage is implicit in these blocks. A TABLE with a
+  <code>data_transformer.inputs</code> of <code>[upstream_oddrn]</code>
+  declares an edge. There’s no separate lineage endpoint.</p>
+  <h2 id="persistence">Persistence</h2>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Store</th>
+  <th>Role</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td>Postgres</td>
+  <td>Source of truth + search index. Entities, tags, owners, terms,
+  ingestion logs all in normal SQL tables. Full-text search via
+  <code>tsvector</code>.</td>
+  </tr>
+  <tr>
+  <td></td>
+  <td>(Nothing else.)</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>The platform doesn’t run Kafka, doesn’t run Elasticsearch, doesn’t
+  run a graph database. Everything is normalised SQL. Lineage walks are
+  recursive CTEs against the entity table. Search is
+  <code>tsvector @@ to_tsquery(...)</code>.</p>
+  <p>This is the single biggest architectural difference from OMD (which
+  adds Elasticsearch) or DataHub (which adds Kafka + Elasticsearch +
+  Neo4j). The trade-off is performance scaling — full-text Postgres
+  search is fine for tens of thousands of entities, less fine for
+  millions.</p>
+  <h2 id="the-ingestion-api">The ingestion API</h2>
+  <p>The headline endpoint:</p>
+  <table>
+  <colgroup>
+  <col style="width: 50%" />
+  <col style="width: 50%" />
+  </colgroup>
+  <thead>
+  <tr>
+  <th>Endpoint</th>
+  <th>Purpose</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+  <td><code>POST /ingestion/entities</code></td>
+  <td>Push one or more DataEntities. Body:
+  <code>{data_source_oddrn, items: [...]}</code></td>
+  </tr>
+  <tr>
+  <td><code>POST /api/datasources</code></td>
+  <td>Register a DataSource (must exist before entities under it can be
+  ingested)</td>
+  </tr>
+  <tr>
+  <td><code>GET /api/datasources</code></td>
+  <td>List sources</td>
+  </tr>
+  <tr>
+  <td><code>POST /api/datasources/{id}/tokens</code></td>
+  <td>Generate a token for a data source</td>
+  </tr>
+  <tr>
+  <td><code>GET /api/dataentities</code></td>
+  <td>List entities, with filters</td>
+  </tr>
+  <tr>
+  <td><code>GET /api/dataentities/{id}/lineage</code></td>
+  <td>Walk the lineage graph from an entity</td>
+  </tr>
+  <tr>
+  <td><code>POST /api/owners</code> / <code>tags</code> /
+  <code>terms</code></td>
+  <td>Manage governance entities</td>
+  </tr>
+  </tbody>
+  </table>
+  <p>Authentication is a token in
+  <code>Authorization: Bearer &lt;token&gt;</code>. Two scopes exist:
+  collector tokens (created in the UI under Management → Collectors,
+  scope to manage their own data sources) and data-source tokens
+  (created when a data source is registered, scope to push entities
+  under that source).</p>
+  <h2 id="what-the-model-omits">What the model omits</h2>
+  <p>This is where the comparison stories get sharpest:</p>
+  <ul>
+  <li><strong>No aspects.</strong> Entities are monolithic. Two
+  producers cannot independently update non-overlapping pieces of the
+  same entity without re-sending the whole envelope. Re-ingest
+  overwrites the existing record.</li>
+  <li><strong>No pipeline-as-asset.</strong> The orchestrator is assumed
+  external; ODD records runs, not definitions.</li>
+  <li><strong>No DQ-test-as-asset.</strong> The DQ framework is assumed
+  external; ODD records results.</li>
+  <li><strong>No event bus.</strong> Producers push on a schedule via
+  HTTP. There’s no <code>MetadataChangeLog</code> consumers can
+  subscribe to.</li>
+  <li><strong>No environment (PROD/DEV) in the identity.</strong> Where
+  DataHub URNs encode environment, ODD OddRNs assume the producer
+  disambiguates via host. Same entity name in two environments needs two
+  different host OddRNs.</li>
+  <li><strong>No native column-level lineage rendering.</strong> The
+  model permits column-mappings on <code>data_transformer</code> blocks,
+  but the open-source UI renders only table-level edges.</li>
+  </ul>
+  <p>These aren’t omissions in the sense of missing features — they’re
+  the consequence of the design choice that ODD is a <strong>spec for
+  interchange</strong>, not a <strong>catalog with opinions about how
+  producers should be structured</strong>.</p>
+  <h2 id="mental-shortcut">Mental shortcut</h2>
+  <p>When stuck on “how do I do X in ODD”, three questions land most
+  tasks:</p>
+  <ol type="1">
+  <li><strong>What’s the OddRN?</strong> (Construct it from the source
+  system’s natural identifiers.)</li>
+  <li><strong>What DataEntityType fits?</strong> (From the closed enum;
+  pick the closest if a perfect match doesn’t exist.)</li>
+  <li><strong>Which payload block carries the relationship?</strong>
+  (<code>data_transformer</code> for lineage, <code>data_consumer</code>
+  for read relationships, <code>dataset.field_list</code> for
+  schema.)</li>
+  </ol>
+  <p>If those three are clear, the entity body writes itself.</p>
+  <h2 id="why-this-shape">Why this shape</h2>
+  <p>The design bet is that <strong>interop matters more than feature
+  parity</strong>. A spec that’s small and stable can be implemented by
+  anyone — collectors, alternative platforms, custom internal tools —
+  without a vendor in the middle. The platform itself stays simple
+  because it doesn’t need to be the source of truth for every concept;
+  it only needs to render the spec correctly.</p>
+  <p>The trade-off is that the surface is smaller. Things OMD or DataHub
+  treat as first-class (pipelines, DQ tests as authored assets,
+  fine-grained event-driven updates) are either out-of-scope or pushed
+  onto producers. For organisations that want their catalog to be a
+  polished product, that’s a gap. For organisations that want their
+  catalog to be a thin layer over their existing producers, that’s the
+  point.</p>
+  </main>
+</div>
+
+<footer class="foot">openmetadata · poc notes</footer>
+
+<script>
+// Smooth-scroll active TOC link
+document.addEventListener('DOMContentLoaded', () => {
+  const tocLinks = document.querySelectorAll('nav#TOC a[href^="#"]');
+  if (!tocLinks.length) return;
+  const targets = Array.from(tocLinks).map(a => document.getElementById(a.getAttribute('href').slice(1))).filter(Boolean);
+  const linkFor = new Map();
+  tocLinks.forEach(a => linkFor.set(a.getAttribute('href').slice(1), a));
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      const id = e.target.id;
+      const link = linkFor.get(id);
+      if (!link) return;
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+  targets.forEach(t => obs.observe(t));
+});
+</script>
+</body>
+</html>
