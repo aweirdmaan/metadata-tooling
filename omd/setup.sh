@@ -30,9 +30,39 @@ export JAVA_HOME="$JAVA_HOME_EXPECTED"
 # ---------------------------------------------------------------------------
 # Stack
 
-echo "[1/6] Bringing up OMD stack (postgres + elasticsearch + server + ingestion)..."
+echo "[1/6] Bringing up OMD stack..."
+echo "      starting postgres + elasticsearch first..."
+docker-compose up -d postgresql elasticsearch
+until [ "$(docker inspect -f '{{.State.Health.Status}}' openmetadata_postgresql 2>/dev/null)" = "healthy" ] \
+   && [ "$(docker inspect -f '{{.State.Health.Status}}' openmetadata_elasticsearch 2>/dev/null)" = "healthy" ]; do
+  sleep 3
+done
+echo "      postgres + elasticsearch healthy"
+
+# Run DB migrations if the schema hasn't been initialized yet.
+# (OMD's docker-compose doesn't include the execute_migrate_all init container
+# the official compose ships, so we run the same step manually here. Idempotent —
+# subsequent runs no-op once the schema is in place.)
+if ! docker exec openmetadata_postgresql \
+     psql -U openmetadata_user -d openmetadata_db -tAc "SELECT to_regclass('public.dbservice_entity')" 2>/dev/null \
+     | grep -q "dbservice_entity"; then
+  echo "      running first-time DB migrations..."
+  docker run --rm --network omd_app_net \
+    -e DB_DRIVER_CLASS=org.postgresql.Driver \
+    -e DB_HOST=postgresql -e DB_PORT=5432 \
+    -e DB_USER=openmetadata_user -e DB_USER_PASSWORD=openmetadata_password \
+    -e OM_DATABASE=openmetadata_db -e DB_SCHEME=postgresql -e DB_USE_SSL=false \
+    -e ELASTICSEARCH_HOST=elasticsearch -e ELASTICSEARCH_PORT=9200 \
+    -e ELASTICSEARCH_SCHEME=http -e SEARCH_TYPE=elasticsearch \
+    openmetadata/server:1.12.0 \
+    /opt/openmetadata/bootstrap/openmetadata-ops.sh migrate >/dev/null 2>&1
+  echo "      migrations complete"
+else
+  echo "      DB already migrated"
+fi
+
+echo "      starting server + ingestion..."
 docker-compose up -d
-echo "      waiting for server health..."
 until [ "$(docker inspect -f '{{.State.Health.Status}}' openmetadata_server 2>/dev/null)" = "healthy" ]; do sleep 3; done
 echo "      server healthy → http://localhost:8585  (admin@open-metadata.org / admin)"
 
