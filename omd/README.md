@@ -19,7 +19,7 @@ docker compose up -d
 Wait ~2 minutes for all four containers to become healthy. Then open:
 
 - **OMD UI:** http://localhost:8585 — log in with `admin@open-metadata.org` / `admin`
-- **Airflow:** http://localhost:8080 — `admin` / `admin`
+- **Airflow:** http://localhost:8081 — `admin` / `admin`
 
 If Elasticsearch restart-loops, it usually means Docker Desktop has insufficient memory. Increase to ≥ 6 GiB in Docker Desktop → Settings → Resources.
 

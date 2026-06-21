@@ -34,10 +34,26 @@ Each `setup.sh` is idempotent.
 - [`odd/docs/odd-domain-model.html`](./odd/docs/odd-domain-model.html) — ODD spec-first model
 - [`comparison.html`](./comparison.html) — side-by-side comparison of all three
 
-## Port conflicts
-
 OMD's Elasticsearch and DataHub's OpenSearch both bind `:9200`. Run one catalog at a time, or remap.
 
 ## History
 
 Each POC's history is preserved under its subdirectory, merged via `git filter-repo --to-subdirectory-filter`. Use `git log -- omd/` (or `datahub/`, `odd/`) to walk the slice-by-slice commits for one POC.
+
+## Host ports
+
+All three stacks coexist; host ports are non-overlapping.
+
+| Catalog | Service | Host port |
+|---|---|---|
+| OMD | Server (UI + API) | 8585, 8586 |
+| OMD | Postgres | 5432 |
+| OMD | Elasticsearch | 9201, 9301 |
+| OMD | Embedded Airflow | 8081 |
+| DataHub | Frontend (UI) | 9002 |
+| DataHub | GMS | 8080 |
+| DataHub | MySQL | 3306 |
+| DataHub | Kafka | 9092 |
+| DataHub | OpenSearch | 9200 |
+| ODD | Platform (UI + API) | 8090 |
+| ODD | Postgres | 5532 |
